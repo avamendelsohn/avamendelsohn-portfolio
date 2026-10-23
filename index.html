@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ava Mendelsohn</title>
+<meta name="description" content="Ava Mendelsohn: human factors, UI/UX, product and architectural design.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Caveat:wght@700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+/* One sideways walk: scrolling down carries you right, from the dusk intro (after pavlosanchez.com) through six studios,
+   each its own room with its own walls. Project slides borrow from rauno.me. Each project opens as a full-bleed colored chapter with its whole gallery. Single "physical" theme by choice. */
+:root{
+  --wall:#e8e1d3; --ink:#1d1a16; --tomato:#ff5a36; --cobalt:#1e4fd6; --violet:#5a3cf0; --sun:#f7d44a; --leaf:#2d8a5c; --paper:#fbf8f2; --pencil:#c2361b; --kraft:#c9b08c; --pink:#f4a9c6;
+  --display:"Bricolage Grotesque",system-ui,sans-serif; --serif:"Instrument Serif",Georgia,serif; --hand:"Caveat","Comic Sans MS",cursive; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --gx:max(clamp(16px,2.2vw,32px),env(safe-area-inset-left,0px)); --gxr:max(clamp(16px,2.2vw,32px),env(safe-area-inset-right,0px));
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+html,body{overflow-x:clip;overscroll-behavior-x:none}
+/* the page scrollbar would eat into the 100vw rooms, and the ruler already shows where you are */
+html{scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:var(--wall);color:var(--ink);font:16px/1.5 var(--display)}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--cobalt);outline-offset:4px}
+.serif{font-family:var(--serif);font-weight:400}
+
+/* ---------- intro ---------- */
+/* golden-hour sky sampled from Ava's pelican photo: cream at the top, warming through gold to orange, over a low
+   blue-grey sea with its horizon at 86%. The pelicans' canvas adds haze and light on the water. The glow fades as you walk in */
+.intro{--sink:0;position:relative;isolation:isolate;flex:none;width:100vw;height:100%;color:var(--ink);background:linear-gradient(180deg,#ead7bb 0%,#f5d9aa 15%,#fdd492 30%,#ffc47c 45%,#fcaf68 60%,#f5a064 71%,#f6925a 79%,#fa8648 84%,#fc8a40 85.9%,#e1814e 86.1%,#bf7b5e 88.5%,#95746f 91.5%,#6c616a 95.5%,#56535c 100%);display:grid;grid-template-rows:auto 1fr auto;padding:calc(22px + env(safe-area-inset-top,0px)) var(--gxr) 22px var(--gx)}
+.intro::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,transparent 0,transparent 55%,rgba(255,160,90,.22) 78%,rgba(255,150,90,.28) 85.8%,transparent 86.1%);transform:translateY(calc(var(--sink) * 5%));opacity:calc(1 - var(--sink) * .8)}
+.intro::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.07;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* brown pelicans fly across the dusk behind the text, drawn on a canvas each frame (see the pelicans script) */
+.sky{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.intro header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.name{margin:0;font:600 19px/24px var(--display);letter-spacing:-.01em}
+.name .serif{display:block;font-size:24px;line-height:1.1;letter-spacing:0;opacity:.9}
+.nav{display:flex;gap:18px;font-weight:600;font-size:17px;line-height:24px}
+.nav a{text-decoration:none}
+.nav a:hover{text-decoration:underline;text-underline-offset:4px}
+/* left-aligned with the name and contact links, sitting a little above centre (was: justify-self:center; margin:8vh 0 0) */
+.statement{align-self:center;justify-self:start;margin:0 0 8vh;font:600 clamp(28px,3.8vw,52px)/1.08 var(--display);letter-spacing:-.025em;max-width:22ch;text-wrap:balance;padding-block:40px}
+.statement .serif{font-style:italic;font-size:1.12em;letter-spacing:0}
+.intro footer{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+.contact{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:19px;line-height:1.3}
+.contact{color:var(--paper);text-shadow:0 1px 8px rgba(30,26,34,.35)}
+.contact dt{display:flex;align-items:center}
+.contact dt svg{width:17px;height:17px}
+.contact dd{margin:0;font-family:var(--serif)}
+.contact a{text-decoration:none}
+.contact a:hover{text-decoration:underline}
+.down{position:absolute;right:var(--gxr);top:50%;margin-top:-18px;width:36px;height:36px;display:grid;place-items:center;animation:nudge 2.4s ease-in-out infinite}
+.down svg{width:20px;height:36px}
+.down{color:#c2501d;opacity:.55}.down svg{width:14px;height:26px}.down svg path{stroke-width:1.4}
+/* test: home text in the same dark orange as the timeline (delete this line to go back to black) */
+.intro{color:#c2501d}.intro .statement{color:var(--ink)}
+@keyframes nudge{50%{transform:translateX(6px)}}
+.me{width:min(200px,28vw);transform:translate(var(--dx,0px),var(--dy,0px)) rotate(var(--mr,3deg));cursor:grab;touch-action:none;user-select:none;z-index:5;transition:box-shadow .15s;background:#ece5da;padding:8px 8px 26px;position:relative;box-shadow:0 16px 28px -16px rgba(12,10,20,.75)}
+.me::before{content:"";position:absolute;top:-10px;left:50%;width:70px;height:20px;margin-left:-35px;background:rgba(255,253,240,.55);transform:rotate(-4deg)}
+.me.lift{cursor:grabbing;--mr:1deg;box-shadow:0 30px 40px -18px rgba(0,0,0,.95)}
+.me img{pointer-events:none;-webkit-user-drag:none;aspect-ratio:1;object-fit:cover;width:100%;filter:saturate(.86) brightness(.97)}
+.me span{position:absolute;bottom:2px;left:0;right:0;text-align:center;font:700 18px var(--hand);color:var(--ink)}
+
+/* name, ruler and nav all sit on one 24px line at the top, in the intro and in every room */
+/* ---------- the walk: a tall page whose vertical scroll slides a long rail of rooms sideways ---------- */
+.walk{position:relative}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden}
+.rail{display:flex;height:100%;width:max-content;will-change:transform}
+.hud{position:absolute;inset:0 0 auto;z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:16px;padding:calc(22px + env(safe-area-inset-top,0px)) var(--gxr) 0 var(--gx);color:#fff;mix-blend-mode:difference;pointer-events:none;font:600 17px/24px var(--display)}
+.hud>*{pointer-events:auto}
+.hud .home{font-size:19px;letter-spacing:-.01em}
+.hud .home,.hud .ab{text-decoration:none;opacity:0;transition:opacity .3s;pointer-events:none}
+.hud.out .home,.hud.out .ab{opacity:1;pointer-events:auto}
+.hud .ab{justify-self:end}
+.hud .mid{display:grid;justify-items:center;gap:8px}
+.where{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.ruler{display:flex;align-items:center;gap:9px;height:24px;position:relative}
+.ruler button{box-sizing:content-box;width:1px;height:10px;padding:0 4px;margin:0 -4px;border:0;background:rgba(255,255,255,.6);background-clip:content-box;cursor:pointer}
+.ruler button.room-start{height:20px;background-color:#fff}
+.ruler .win{position:absolute;top:-1px;left:0;width:16px;height:26px;border:1.5px solid #fff;border-radius:2px;pointer-events:none;transition:transform .2s ease}
+/* on the home sunset the timeline is dark orange, matching the glow at the water line */
+.hud:not(.out){mix-blend-mode:normal;color:#c2501d}
+.hud:not(.out) .ruler button{background-color:rgba(194,80,29,.65)}
+.hud:not(.out) .ruler button.room-start{background-color:#c2501d}
+.hud:not(.out) .ruler .win{border-color:#c2501d}
+
+.room{--bg:#ececea;--fg:#1a1a1a;--muted:#6d6d69;flex:none;height:100%;display:flex;align-items:center;gap:clamp(22px,3vw,44px);padding:0 clamp(40px,8vw,140px);background:var(--bg);color:var(--fg);position:relative}
+.door{flex:none;width:min(30vw,380px)}
+.door .no{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.door h2{margin:14px 0 6px;font:800 clamp(42px,5.2vw,80px)/.9 var(--display);letter-spacing:-.04em;text-wrap:balance}
+.door .sub{margin:0 0 18px;font:italic 400 clamp(22px,2.2vw,30px)/1 var(--serif)}
+.door .blurb{margin:0;max-width:30ch;font-size:16px;line-height:1.45;color:var(--muted)}
+.door .count{display:block;margin-top:22px;font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.room a{-webkit-user-drag:none}
+.room img{-webkit-user-drag:none;pointer-events:none}
+
+/* project slides (UX + personal): white 16:10 faces after rauno.me */
+.kind{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.slide{--ch:min(54svh,52vw);flex:none;margin:0;position:relative}
+.slide .lab{position:absolute;top:-22px;left:0;font:400 12px/1 var(--display);color:var(--muted);white-space:nowrap}
+.slide .lab b{font-weight:600;color:var(--fg);margin-right:8px}
+.face{display:block;height:var(--ch);width:calc(var(--ch) * 1.6);background:#fff;position:relative;overflow:hidden;color:#1a1a1a;text-decoration:none}
+.face img,.piece img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--pos,50% 50%);transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.face.mat img{inset:9% 8%;width:84%;height:82%;object-fit:contain}
+.face.mat::before{content:"";position:absolute;width:62%;aspect-ratio:1;right:-6%;top:50%;transform:translateY(-50%);border-radius:50%;background:var(--dot)}
+.face:hover img{transform:scale(1.025)}
+.face.ph{background:var(--dot,var(--ink));color:var(--pf,var(--paper));display:flex;align-items:center;justify-content:center}
+.face.ph .ph-in{display:grid;gap:12px;text-align:center}
+.face.ph .ph-in b{font:800 clamp(34px,4.6vw,64px)/1 var(--display);letter-spacing:-.035em}
+.face.ph .ph-in span{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+.face .go{position:absolute;right:18px;bottom:16px;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;background:#fff;padding:6px 9px;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s}
+.face .frm{position:absolute;inset:0;border:clamp(5px,1vmin,9px) solid var(--fc);pointer-events:none;z-index:1}
+.face:hover .go,.face:focus-visible .go{opacity:1;transform:none}
+
+/* pieces (art, photos, drawings): their own proportions, hung differently in each room */
+.piece{flex:none;display:block;position:relative;height:min(var(--ph,54svh),calc(78vw / var(--r)));aspect-ratio:var(--r);transform:translateY(var(--y,0)) rotate(var(--rot,0deg))}
+.piece:hover img{transform:scale(1.02)}
+.piece .frame{position:absolute;inset:0;overflow:hidden}
+
+.room.art{--bg:#eee5d6;--fg:#2a2118;--muted:#7a6b58}
+.art .piece .frame{box-shadow:0 22px 30px -20px rgba(70,45,20,.55),0 2px 4px rgba(70,45,20,.12)}
+
+.room.photo{--bg:#1c1b1a;--fg:#efebe4;--muted:#9a948a}
+.photo .piece{padding:clamp(8px,1.4svh,16px);background:#f6f3ec;box-shadow:0 26px 34px -22px #000}
+.photo .piece .frame{inset:clamp(8px,1.4svh,16px)}
+.photo .piece::before{content:"";position:absolute;left:-30%;right:-30%;top:-40%;height:120%;z-index:-1;background:radial-gradient(closest-side,rgba(255,236,205,.12),transparent);pointer-events:none}
+.photo .piece{isolation:isolate}
+.piece.hold .frame{display:grid;place-items:center;background:linear-gradient(160deg,#3a3734,#2b2927);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.piece.hold .frame span{font:500 11px/1 var(--mono,ui-monospace,monospace);letter-spacing:.14em;text-transform:uppercase;color:rgba(246,243,236,.45)}
+
+.room.ux{--bg:#ececea}
+.room.personal{--bg:#e4e8e0;--muted:#66705f}
+
+.room.arch{--bg:#f3f2ec;--fg:#1d2a38;--muted:#5d6f84;background-image:linear-gradient(rgba(60,110,170,.11) 1px,transparent 1px),linear-gradient(90deg,rgba(60,110,170,.11) 1px,transparent 1px);background-size:28px 28px}
+.arch .piece .frame{background:#fff;border:1px solid #a9b8c9}
+.arch .piece .frame img{object-fit:contain}
+
+/* the walk ends back outside, under the same golden sky and sea as the start, with photos clipped up like the polaroid */
+.room.outdoor{--fg:var(--ink);--muted:rgba(29,26,22,.7);background:linear-gradient(180deg,#ead7bb 0%,#f5d9aa 15%,#fdd492 30%,#ffc47c 45%,#fcaf68 60%,#f5a064 71%,#f6925a 79%,#fa8648 84%,#fc8a40 85.9%,#e1814e 86.1%,#bf7b5e 88.5%,#95746f 91.5%,#6c616a 95.5%,#56535c 100%)}
+.outdoor .piece{background:#ece5da;padding:8px 8px 30px;box-shadow:0 18px 28px -16px rgba(12,10,20,.8)}
+.outdoor .piece .frame{inset:8px 8px 30px}
+
+.room.about{--bg:var(--ink);--fg:var(--paper);--muted:rgba(251,248,242,.7);align-items:center}
+.about .in{width:min(1080px,calc(100vw - 80px));display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:28px 48px;max-height:calc(100svh - 120px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.about h2{margin:0;font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;grid-column:1/-1}
+.about .lede{margin:0;font:400 clamp(26px,3vw,38px)/1.15 var(--serif);grid-column:1/-1;max-width:30ch}
+.about p{margin:0 0 10px;max-width:60ch;opacity:.9}
+.about h3{margin:0 0 8px;font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.7}
+.room.about{width:100vw;box-sizing:border-box;padding-left:var(--gx);padding-right:var(--gxr)}
+.about .in{width:min(1080px,100%)!important;max-height:none!important;overflow:visible!important}
+@media (max-height:760px){.about .in{gap:16px 40px!important}.about .lede{font-size:clamp(22px,2.6vw,30px)!important}.about p,.about .in a{font-size:15px}.about h3{margin-bottom:4px}}
+@media (max-height:620px){.about .in{gap:8px 36px!important}.about .small{display:none}.about .lede{font-size:19px!important}.about p,.about .in a{font-size:12.5px;line-height:1.4}.about p{margin-bottom:6px}.about h3.gap{margin-top:6px}.about .small{margin-top:0}}
+.about .out{margin-top:0;align-self:start}
+.about .out p{margin-bottom:8px}
+.about .out p{margin:0 0 14px}
+.omap{position:relative;max-width:min(100%,calc(22svh * 1.6))}
+.omap svg{display:block;width:100%;height:auto;overflow:visible}
+.omap .nat{fill:rgba(251,248,242,.07);stroke:rgba(251,248,242,.28);stroke-width:1}
+.omap .st{fill:none;stroke:rgba(251,248,242,.14);stroke-width:.7}
+.omap .pin{cursor:pointer}
+.omap .pin circle.d{fill:var(--tomato);stroke:var(--ink);stroke-width:2}
+.omap .pin circle.r{fill:var(--tomato);opacity:.25}
+.omap .pin text{font:500 24px var(--mono);letter-spacing:.04em;fill:var(--paper);paint-order:stroke;stroke:var(--ink);stroke-width:4px}
+.omap .pin:hover circle.d,.omap .pin:focus circle.d{fill:var(--sun)}
+.omap .tip{position:absolute;pointer-events:none;transform:translate(-50%,calc(-100% - 18px));background:var(--paper);color:var(--ink);padding:6px;font:500 11px var(--mono);letter-spacing:.04em;opacity:0;transition:opacity .15s;width:180px}
+.omap .tip img{display:block;width:100%;height:auto;margin-bottom:6px}
+.omap .tip.on{opacity:1}
+.about h3.gap{margin-top:18px}.about .in>div>.lede{margin-bottom:22px;max-width:none}.about .abc{position:absolute;left:var(--gx);bottom:22px}.room.about{padding-bottom:96px!important}.about .lede{font-size:clamp(22px,2.3vw,32px)!important;max-width:44ch}.room.about{padding-top:76px;padding-bottom:24px}@media (min-width:700px){.about .in{grid-template-columns:1fr 1fr;align-items:start}}@media (max-height:620px){.about .lede{font-size:19px!important}}@media (max-height:760px){.about h3.gap{margin-top:10px}}
+.about .small{font:500 12px var(--mono);opacity:.6;grid-column:1/-1;margin-top:12px}
+/* a tiny Ava in a cap, t-shirt, running shorts and sneakers walks through the rooms as a plain silhouette, like the pelicans: her legs keep time with the scroll,
+   she turns around when you scroll back, and she turns light in the dark rooms */
+.walker{position:absolute;left:22vw;bottom:calc(27px + env(safe-area-inset-bottom,0px));z-index:15;width:34px;height:68px;transform-origin:50% 100%;
+  cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.walker.held{cursor:grabbing}
+.walker svg{width:100%;height:100%;overflow:visible;display:block}
+.walker .front,.walker.facing .side{display:none}
+.walker.facing .front{display:block}
+.walker{color:#1d1820;opacity:.92;transition:color .4s}
+.walker.light{color:#ece6dc}
+.walker.sea.up{color:#1d1820}   /* lifted off the sea into the sky she's a dark silhouette, like the birds */
+.rail.drag{cursor:grabbing}
+.rail.drag a{pointer-events:none}
+
+/* ---------- project chapter ---------- */
+.chapter{position:fixed;inset:0;z-index:1000;overflow:auto;background:var(--bg);color:var(--fg);overscroll-behavior:contain}
+.chapter .top{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top,0px)) var(--gxr) 14px var(--gx);background:linear-gradient(var(--bg) 60%,transparent)}
+.chapter .top button,.chapter .top a{font:500 12px var(--mono);letter-spacing:.05em;text-transform:uppercase;background:var(--fg);color:var(--bg);border:0;padding:7px 11px;cursor:pointer;text-decoration:none}
+.chap{padding:4vh var(--gxr) 60px var(--gx);max-width:1400px;margin:0 auto}
+.soon-page{min-height:calc(100svh - 140px);display:flex;flex-direction:column;justify-content:center}.soon-tag{margin:0;font:500 14px var(--mono);letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.chap .for{margin:0;font:italic 400 clamp(22px,2.4vw,30px)/1 var(--serif)}
+.chap h1{margin:6px 0 24px;font:800 clamp(52px,10vw,150px)/.86 var(--display);letter-spacing:-.045em;text-wrap:balance}
+/* intro, extra paragraphs and skills on the left; challenge and role on the right, so the columns stay close in height */
+.lead{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:32px 56px;align-items:start;margin-bottom:48px}
+.lead .skills{margin-top:26px}.lead .skills h3{margin:0 0 6px;font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.lead .intro-text{margin:0;font:400 clamp(20px,1.9vw,26px)/1.3 var(--serif)}
+.meta{display:grid;gap:18px;font-size:15px;min-width:0;overflow-wrap:break-word}
+.meta h3{margin:0 0 4px;font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.meta p{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.04em;border:1.5px solid currentColor;padding:3px 7px}
+.more{margin:24px 0 0;font-size:16px;max-width:62ch}
+.more p{margin:0 0 14px;break-inside:avoid}
+.gallery{columns:3 280px;column-gap:14px}
+.gallery button{display:block;width:100%;margin:0 0 14px;padding:0;border:0;background:var(--tile,rgba(255,255,255,.12));cursor:zoom-in;break-inside:avoid}
+.gallery img{width:100%;height:auto}
+/* once laid out by script: a masonry of absolute tiles, so a panorama named in p.wide can span two columns */
+.gallery.laid{columns:auto;position:relative}
+.gallery.laid button{position:absolute;margin:0}
+.gallery.laid img{height:100%;object-fit:cover;display:block}
+/* arrange mode (owner only): drag one piece onto another, or tap two, to swap them */
+.chapter .top .acts{display:flex;gap:8px}
+.chapter .top #cEdit.on{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--fg)}
+.arranging .gallery button{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.arranging .gallery img{pointer-events:none;-webkit-user-drag:none}
+.gallery button.pick{outline:3px solid var(--fg);outline-offset:3px}
+.gallery button.over{outline:3px dashed var(--fg);outline-offset:3px;opacity:.6}
+.gallery button.lift{z-index:3;opacity:.85;cursor:grabbing;pointer-events:none;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+/* case-study layout */
+/* case study as color-blocked chapters: each section is a full-bleed band, a small label top-left, content centered in a reading column */
+.study section{--sb:transparent;--sf:inherit;position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,760px) minmax(0,1fr);gap:24px 40px;padding:88px 0;background:var(--sb);color:var(--sf);box-shadow:0 0 0 100vmax var(--sb);clip-path:inset(0 -100vmax)}
+.study section.b1{--sb:var(--paper);--sf:var(--ink)}.study section.b2{--sb:var(--ink);--sf:var(--paper)}.study section.b3{--sb:#fff;--sf:var(--ink)}
+.study section.hero{--sb:#fff;display:block;padding:72px 0}
+.study .hero button{display:block;margin:0 auto;max-width:760px;width:100%;padding:0;border:0;background:none;cursor:zoom-in}.study .hero img{display:block;width:100%;height:auto}
+.study h2{margin:0;font:800 17px/1.15 var(--display);letter-spacing:-.005em;max-width:16ch}
+.study .body{grid-column:2;font-size:16px;line-height:1.55}
+.study .body p{margin:0 0 14px}.study .body p:first-child{font:400 clamp(21px,2vw,27px)/1.3 var(--serif)}
+.study ul{list-style:none;margin:0 0 18px;padding:0}
+.study .steps li,.study .map li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:6px 24px;padding:12px 0;border-bottom:1px solid color-mix(in srgb,currentColor 25%,transparent)}
+.study .steps b,.study .map b{font:500 12px/1.5 var(--mono);letter-spacing:.04em;text-transform:uppercase}
+.study .map b{font:400 19px/1.25 var(--serif);text-transform:none;letter-spacing:0}
+.study .map span::before{content:"→ ";opacity:.6}
+.study .ins{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 36px;margin-bottom:44px}
+.study .ins b{display:block;margin-bottom:8px;font:800 19px/1.15 var(--display);letter-spacing:-.01em}
+.study blockquote{margin:0 0 26px;font:400 clamp(22px,2.1vw,28px)/1.25 var(--serif)}
+.study cite{display:block;margin-top:8px;font:500 11px var(--mono);font-style:normal;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+.study .figs{grid-column:2;margin:24px 0 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
+.study .figs.one{grid-template-columns:1fr}
+.study .figs button{display:block;padding:0;border:0;background:#fff;cursor:zoom-in;box-shadow:0 0 0 1px color-mix(in srgb,currentColor 15%,transparent)}
+.study .figs img{display:block;width:100%;height:auto}
+.study figcaption{grid-column:1/-1;font-size:13px;opacity:.7}
+.pager{display:flex;justify-content:space-between;gap:16px;margin-top:56px;padding-top:20px;border-top:1.5px solid currentColor}
+.pager a{text-decoration:none;font:800 clamp(20px,2.4vw,30px)/1.1 var(--display);letter-spacing:-.02em}
+.pager a span{display:block;font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.pager a:last-child{text-align:right}
+
+/* ---------- lightbox ---------- */
+.lb{position:fixed;inset:0;z-index:1100;background:rgba(15,13,11,.94);display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:calc(16px + env(safe-area-inset-top,0px)) var(--gxr) 16px var(--gx)}
+.lb img{max-width:100%;max-height:calc(100svh - 64px);margin:auto;object-fit:contain;background:#fff}
+.lb button{background:none;border:0;color:var(--paper);font:500 13px var(--mono);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;padding:12px}
+.lb .x{position:absolute;top:calc(8px + env(safe-area-inset-top,0px));right:var(--gxr)}
+.lb .count{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:var(--paper);font:500 12px var(--mono);opacity:.7}
+
+@media (max-width:760px){
+  .intro footer{flex-direction:column-reverse;align-items:flex-start}
+  .me{align-self:flex-end;width:140px;margin-bottom:6px}
+  .nav{gap:12px;font-size:15px}
+  .name .serif{font-size:19px}
+  .room{padding-inline:28px;gap:18px}
+  .door{width:min(78vw,340px);margin-right:20px}
+  .slide{--ch:min(40svh,calc(84vw / 1.6))}
+  .ruler{gap:5px}
+  .ruler button{padding:0 2px;margin:0 -2px}
+  .ruler .win{width:12px}
+  .hud{grid-template-columns:1fr;justify-items:center}
+  .hud .home,.hud .ab{display:none}
+  .intro{padding-top:calc(64px + env(safe-area-inset-top,0px))}
+  .walker{width:26px;height:52px}
+  .down{display:none}
+  .lead{grid-template-columns:1fr}
+  .study section,.study .steps li,.study .map li,.study .ins,.study .figs{grid-template-columns:1fr}
+  .study section{padding:56px 0}.study .body,.study .figs{grid-column:1}
+  .lb{grid-template-columns:1fr}
+  .lb .prev,.lb .next{position:absolute;bottom:0}
+  .lb .prev{left:var(--gx)} .lb .next{right:var(--gxr)}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.face img,.piece img,.ruler .win{transition:none}.down{animation:none}}
+</style>
+</head>
+<body>
+
+<div class="walk" id="walk">
+<div class="stage">
+<div class="hud" id="hud"><a class="home" href="#top">Ava Mendelsohn</a><div class="mid"><div class="ruler" id="ruler"><span class="win"></span></div><span class="where" id="where">Hello</span></div><a class="ab" href="#about">About</a></div>
+<div class="walker" id="walker" aria-hidden="true"><svg class="side" viewBox="0 0 30 60" fill="currentColor"><g class="body">
+  <g class="torso"><g data-arm="-1"><g class="upper">
+    <path d="M13.3 13.9C13.2 15.4 13.3 16.8 13.5 17.9H16.9C17.1 16.8 17.2 15.4 17.1 13.9Z"/>
+    <path d="M13.8 14.6C13.6 17.2 14 19.6 14.4 21.6H16.1C16.5 19.4 16.8 17 16.6 14.6Z"/><circle cx="15.25" cy="21.4" r="1"/>
+    <g class="fore"><path d="M14.35 21.4C14.3 23.4 14.5 25 14.7 26.4H15.9C16.1 25 16.2 23.4 16.15 21.4Z"/><circle cx="15.3" cy="27.1" r="1.4"/></g></g></g></g>
+  <g data-leg="-1"><g class="thigh">
+    <path d="M12.1 27.2C11.4 30.4 11.9 35.4 13.5 41.2H16.6C17.4 38.2 18.6 33.4 17.9 27.2Z"/>
+    <path d="M11.9 27C11.7 29.4 11.6 31.4 11.6 32.8H18.3C18.4 31.4 18.3 29.4 18.1 27Z"/><circle cx="15.05" cy="41" r="1.6"/>
+    <g class="shin"><path d="M13.5 41.2C12 43.6 12.3 47.4 14 51.8L14.3 54.6H15.9C16 51 16.9 45.4 16.6 41.2Z"/>
+      <g class="foot"><path d="M13.6 53.4C12.7 54.6 12.6 56.2 13.2 56.8C13.5 57.1 14 57.1 14.4 57.1H19.8C20.8 57.1 21 56 20.2 55.4C18.9 54.9 17.8 54.3 16.8 53.4Z"/></g></g></g></g>
+  <g class="torso">
+    <path d="M12.6 13.6C14 12.8 16.8 12.8 18 13.6C18.9 15.2 19 17.2 18.4 18.8C17.9 20.2 17.6 21.6 17.7 23C17.9 25 18.4 26.6 18.4 28.4C16.4 29.2 13.6 29.2 11.4 28.4C11.3 26.6 11.6 25 12 23.4C12.3 21.8 12 20 11.8 18.4C11.6 16.4 11.8 14.8 12.6 13.6Z"/>
+    <path d="M13.6 9.6H17.1L17.3 12.6C17.6 13.2 18.1 13.6 18.6 13.9H12.4C12.9 13.5 13.4 13 13.5 12.4Z"/>
+    <g class="head">
+      <ellipse cx="15.6" cy="7" rx="4" ry="4.1"/>
+      <path d="M16 3.6C18.5 3.6 19.8 5.3 19.7 7.2C19.7 7.9 20.2 8.5 20 9C19.5 9.2 19.4 9.6 19.3 10.3C19.1 11.1 18.1 11.2 17 11C15.4 10.8 14.2 10.4 13.4 9.2Z"/>
+      <path d="M11.8 6.2C11.3 7.8 11.3 9.6 12.2 10.9C12.9 11.6 13.9 11.3 14.2 10.6L13.6 6.2Z"/>
+      <path d="M12.8 5.6C12.5 4.7 11.6 4.2 10.8 4.5C10.1 4.1 9.2 4.5 9.1 5.3C8.4 5.6 8.2 6.6 8.7 7.1C8.4 7.8 8.8 8.6 9.6 8.7C10 9.4 11 9.5 11.6 9.1C12.4 9.2 13.1 8.5 13 7.7Z"/>
+      <path d="M11.9 6.5C11.7 3.6 13.5 1.9 15.7 1.9C17.9 1.9 19.3 3.3 19.4 5.1L22.7 5.6C23 5.9 22.8 6.4 22.2 6.4L18.7 6.3C16.5 6.1 14.1 6.3 11.9 6.5Z"/>
+    </g>
+  </g>
+  <g data-leg="1"><g class="thigh">
+    <path d="M12.1 27.2C11.4 30.4 11.9 35.4 13.5 41.2H16.6C17.4 38.2 18.6 33.4 17.9 27.2Z"/>
+    <path d="M11.9 27C11.7 29.4 11.6 31.4 11.6 32.8H18.3C18.4 31.4 18.3 29.4 18.1 27Z"/><circle cx="15.05" cy="41" r="1.6"/>
+    <g class="shin"><path d="M13.5 41.2C12 43.6 12.3 47.4 14 51.8L14.3 54.6H15.9C16 51 16.9 45.4 16.6 41.2Z"/>
+      <g class="foot"><path d="M13.6 53.4C12.7 54.6 12.6 56.2 13.2 56.8C13.5 57.1 14 57.1 14.4 57.1H19.8C20.8 57.1 21 56 20.2 55.4C18.9 54.9 17.8 54.3 16.8 53.4Z"/></g></g></g></g>
+  <g class="torso"><g data-arm="1"><g class="upper">
+    <path d="M13.3 13.9C13.2 15.4 13.3 16.8 13.5 17.9H16.9C17.1 16.8 17.2 15.4 17.1 13.9Z"/>
+    <path d="M13.8 14.6C13.6 17.2 14 19.6 14.4 21.6H16.1C16.5 19.4 16.8 17 16.6 14.6Z"/><circle cx="15.25" cy="21.4" r="1"/>
+    <g class="fore"><path d="M14.35 21.4C14.3 23.4 14.5 25 14.7 26.4H15.9C16.1 25 16.2 23.4 16.15 21.4Z"/><circle cx="15.3" cy="27.1" r="1.4"/></g></g></g></g>
+</g></svg><svg class="front" viewBox="0 0 30 60" fill="currentColor"><!-- facing you, for when she's picked up: the side view's proportions seen from the front -->
+  <g data-fleg="-1"><g class="f-thigh"><path d="M10.9 28.5C10.6 32 11.4 37 11.8 41.2H14.4C14.8 37.5 15.3 32 15.1 28.5Z"/><circle cx="13.1" cy="41" r="1.4"/>
+    <g class="f-shin"><path d="M11.8 41.2C11.2 44 11.6 48 12.2 52L12.4 54.6H13.9C14.1 51 14.8 45 14.4 41.2Z"/><path d="M11.3 54C11 55.5 11 56.6 11.6 57.1H14.8C15.3 56.6 15.2 55.5 14.9 54Z"/></g></g></g>
+  <g data-fleg="1"><g class="f-thigh"><path d="M 19.1 28.5 C 19.4 32 18.6 37 18.2 41.2 H 15.6 C 15.2 37.5 14.7 32 14.9 28.5 Z"/><circle cx="16.9" cy="41" r="1.4"/>
+    <g class="f-shin"><path d="M 18.2 41.2 C 18.8 44 18.4 48 17.8 52 L 17.6 54.6 H 16.1 C 15.9 51 15.2 45 15.6 41.2 Z"/><path d="M 18.7 54 C 19 55.5 19 56.6 18.4 57.1 H 15.2 C 14.7 56.6 14.8 55.5 15.1 54 Z"/></g></g></g>
+  <path d="M10.8 27H19.2C19.5 29 19.6 31 19.5 33H15.5L15 31.2L14.5 33H10.5C10.4 31 10.5 29 10.8 27Z"/>
+  <path d="M11.2 13.6C13.5 13 16.5 13 18.8 13.6C19.6 14.2 19.8 15.8 19.2 17.6C18.7 19.4 18.3 21.2 18.4 23C18.5 25 19 26.6 19.1 28.4C16.6 29.1 13.4 29.1 10.9 28.4C11 26.6 11.5 25 11.6 23C11.7 21.2 11.3 19.4 10.8 17.6C10.2 15.8 10.4 14.2 11.2 13.6Z"/>
+  <path d="M13.4 10H16.6L16.8 12.8C17.4 13.4 18.2 13.7 19 13.9H11C11.8 13.7 12.6 13.4 13.2 12.8Z"/>
+  <path d="M11.6 9.6C10.6 9.4 10.1 10.3 10.4 11.1C10.3 11.9 11 12.4 11.7 12.2C12.4 12.6 13.2 12.1 13.2 11.3Z"/>
+  <ellipse cx="15" cy="7.2" rx="3.6" ry="4"/>
+  <path d="M11.2 6.4C11.2 3.4 12.9 1.9 15 1.9C17.1 1.9 18.8 3.4 18.8 6.4Z"/>
+  <path d="M10.4 6.1C12.5 5.5 17.5 5.5 19.6 6.1C19.9 6.6 19.6 7.1 19.2 7.1C17 6.8 13 6.8 10.8 7.1C10.4 7.1 10.1 6.6 10.4 6.1Z"/>
+  <g data-farm="-1"><path d="M9.2 13.9C9 15.4 9.1 16.8 9.3 17.9H12.6C12.8 16.8 12.9 15.4 12.6 13.9Z"/><path d="M9.6 14.6C9.4 17.2 9.8 19.6 10.1 21.6H11.8C12.2 19.4 12.4 17 12.3 14.6Z"/><circle cx="10.95" cy="21.4" r=".95"/>
+    <g class="f-fore"><path d="M10.1 21.4C10 23.4 10.2 25 10.4 26.4H11.5C11.7 25 11.9 23.4 11.8 21.4Z"/><circle cx="10.95" cy="27.1" r="1.3"/></g></g>
+  <g data-farm="1"><path d="M 20.8 13.9 C 21 15.4 20.9 16.8 20.7 17.9 H 17.4 C 17.2 16.8 17.1 15.4 17.4 13.9 Z"/><path d="M 20.4 14.6 C 20.6 17.2 20.2 19.6 19.9 21.6 H 18.2 C 17.8 19.4 17.6 17 17.7 14.6 Z"/><circle cx="19.05" cy="21.4" r=".95"/>
+    <g class="f-fore"><path d="M 19.9 21.4 C 20 23.4 19.8 25 19.6 26.4 H 18.5 C 18.3 25 18.1 23.4 18.2 21.4 Z"/><circle cx="19.05" cy="27.1" r="1.3"/></g></g>
+</svg></div>
+<div class="rail" id="rail">
+<section class="intro" id="top" aria-label="Introduction">
+  <header>
+    <p class="name">Ava Mendelsohn<span class="serif">Designer</span></p>
+    <nav class="nav"><a href="#studios">Studios</a><a href="#about">About</a></nav>
+  </header>
+  <p class="statement">Selected work and <span class="serif">other explorations.</span></p>
+  <footer>
+    <dl class="contact">
+      <dt><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" role="img" aria-label="Email"><rect x="2" y="4.5" width="20" height="15" rx="1.5"/><path d="M2.5 5.5 12 13l9.5-7.5"/></svg></dt><dd><a href="mailto:avamendelsohn@gmail.com">avamendelsohn@gmail.com</a></dd>
+      <dt><svg viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="LinkedIn"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></dt><dd><a href="https://www.linkedin.com/in/ava-mendelsohn/" rel="noopener">linkedin/ava-mendelsohn</a></dd>
+    </dl>
+  </footer>
+  <div class="sky" aria-hidden="true"></div>
+  <a class="down" href="#studios" aria-label="Walk into the studios"><svg viewBox="0 0 20 36" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l16 16L2 34"/></svg></a>
+</section>
+
+<div id="studios" style="display:contents"></div>
+
+<section class="room about" id="about" aria-labelledby="ab"><div class="in">
+  <h2 id="ab">About</h2>
+  <div>
+    <p class="lede">I'm a Senior Experience Designer at Autodesk, with a background in human factors engineering, architecture and studio art.</p>
+    <p>I've been at Autodesk since July of 2024. My art background and training in human factors shape how I work: I start with how people actually use something, then design with aesthetic and craft at the forefront.</p>
+    <p>Outside of work I love to make things by hand: I build furniture, restore bikes, paint and print. I spend as much time outdoors as possible, biking, hiking, birdwatching or looking for the highest place to watch a sunset.</p>
+    <p>I'm always excited to talk about design, fabrication, the outdoors, or any sort of combination.</p>
+  </div>
+  <div>
+    <h3>Experience</h3><p>Senior Experience Designer, Autodesk · since July 2024</p>
+    <h3 class="gap">Education</h3><p>Tufts University and the School of the Museum of Fine Arts, Boston, five-year dual degree: BS in Human Factors Engineering / UX Design, BA in Architectural Studies, BFA in Studio Art.</p>
+    <h3 class="gap">Interests</h3><p>Experience design, human factors, UX research, product and industrial design, furniture and fabrication, bike restoration, architecture and interiors, painting, printmaking, the outdoors.</p>
+    <h3 class="gap">Tools</h3><p>Figma, Figma Make, Claude, AI prototyping, Illustrator, Photoshop, InDesign, Rhino, SolidWorks, Revit, AutoCAD.</p>
+  </div>
+</div>
+  <dl class="contact abc">
+      <dt><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" role="img" aria-label="Email"><rect x="2" y="4.5" width="20" height="15" rx="1.5"/><path d="M2.5 5.5 12 13l9.5-7.5"/></svg></dt><dd><a href="mailto:avamendelsohn@gmail.com">avamendelsohn@gmail.com</a></dd>
+      <dt><svg viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="LinkedIn"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></dt><dd><a href="https://www.linkedin.com/in/ava-mendelsohn/" rel="noopener">linkedin/ava-mendelsohn</a></dd>
+    </dl>
+</section>
+</div>
+</div>
+</div>
+
+<div class="chapter" id="chapter" hidden role="dialog" aria-modal="true" aria-labelledby="cTitle"></div>
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="prev" type="button">← Prev</button><img alt=""><button class="next" type="button">Next →</button>
+  <button class="x" type="button">Close</button><div class="count"></div>
+</div>
+
+<script src="images.js"></script>
+<script>
+// cover = index into IMAGES[id]; fit/pos tune the slide crop. bg is the chapter color and the slide's circle.
+const PROJECTS=[
+ // professional work under NDA: a placeholder until case studies are ready (no images, so the slide shows a plain card)
+ {id:"autodesk",title:"Autodesk",kind:"UX · Professional work",for:"UX design at",bg:"var(--ink)",fg:"var(--paper)",cover:0,pos:"50% 50%",cbg:"#000",
+  blurb:"Professional UX work at Autodesk. Case studies coming soon.",
+  intro:"UX design work from my time at Autodesk. Because this work is under NDA, case studies are coming soon and available on request in the meantime.",
+  skills:[]},
+ {id:"wesharecare",title:"WeShareCare",kind:"UX research · Telehealth",for:"Redesign for",bg:"var(--cobalt)",fg:"var(--paper)",x:50,y:120,w:300,r:3,cover:39,ar:"4/3",cbg:"#1f3a93",
+  blurb:"Redesigning a telehealth app so patients and providers can actually talk to each other.",
+  intro:"We worked to make WeShareCare, a telehealth platform, more user friendly so patients and providers could communicate better: keeping the features that help, refining them, and removing the ones that don't.",
+  challenge:"Redesign a telehealth application with a myriad of feature issues and poor interface design, that served users and stakeholders very poorly.",
+  role:"Partner project. We split all responsibilities and collaborated with our sponsor, the founder of WeShareCare.",
+  skills:["Project schedule","Questionnaire","Interviews","Stakeholder analysis","Competitor analysis","User study","UI design"],
+  more:["We addressed language translation issues, investigated which telehealth features matter most to users, and applied UI design principles to reformat the app, including the badly broken question feature and the inability to view previous chats or reach previous providers.","Research included a questionnaire on patients' telehealth experiences, interviews with healthcare professionals, stakeholder and competitor analysis, and an in-context user study, all feeding the redesigned patient and provider interfaces."]},
+ {id:"zoox",title:"ZOOX",kind:"UI · In-car interface",for:"Interface for",bg:"var(--violet)",fg:"var(--paper)",x:27,y:640,w:290,r:-4,cover:23,ar:"3/2",cbg:"#06021a",
+  blurb:"A seat-back tablet for riding in an autonomous ZOOX: climate, music, route, and an emergency button.",
+  intro:"ZOOX provides on-demand autonomous ride-hailing. It already had a strong brand and website, so we designed the in-car experience: tablets in the seat backs that let riders control the car and personalize the ride.",
+  challenge:"Create an in-car interface that matches ZOOX's existing visual language and makes riding in a driverless car feel calm and in control.",
+  role:"Team project covering research, feature list, product flow and visual design.",
+  skills:["Moodboard","Feature list","Product flow","Dark UI","Visual design"],
+  more:["The visual language builds on the ZOOX website's futuristic look: dark backgrounds suit a long ride, with purples, blues and greens and glowing accents.","Screens include a welcome and destination confirmation, climate and seat heaters, declaring an emergency to 911, a contact or ZOOX, music and entertainment, and a live map with route changes."]},
+ {id:"hobbees",title:"Hobbees",kind:"UI · Mobile app",for:"Branding & app for",bg:"var(--sun)",fg:"var(--ink)",x:51,y:1180,w:260,r:2.5,cover:19,ar:"5/4",cbg:"#fff6e4",
+  blurb:"A buzzy little app for learning hobbies from each other. Hexagons everywhere.",
+  intro:"A mobile app for learning new hobbies and skills from each other in fun ways: an engaging, intuitive experience that lets people focus on the hobby instead of the interface.",
+  challenge:"Create a mobile application for a concept called Hobbees, where users learn different hobbies from each other on a fun, inviting platform.",
+  role:"Solo interface design project, designing the concept from scratch. User research was outside the project's scope and timeline.",
+  skills:["Moodboard","Color theory","Product flow","Wireframing","Icon design","Branding","Visual design","Interactive prototype"],
+  more:["Bright colors, playful shapes and doodles make the social experience inviting, and give Hobbees a distinctive brand next to Instagram, YouTube and TikTok.","Hexagons and bee motifs carry through the app. The home page leads to classes, recommended hobbees, a schedule and messages, with an expandable chat so members of a class can help each other. In a live class the navigation drops away so the focus stays on the sharer."]},
+ {id:"kalea",hidden:true,title:"KALEA",kind:"UI · Companion app",for:"Companion app for",bg:"var(--leaf)",fg:"var(--paper)",x:73,y:600,w:240,r:-2,cover:1,ar:"4/5",cbg:"#f6efe8",fit:"contain",
+  blurb:"The app for a countertop composter: chamber volumes, alerts, and what you can and can't compost.",
+  intro:"KALEA is an at-home kitchen composting system, then in its Kickstarter phase. I developed the initial interface for its companion app.",
+  challenge:"Create a mobile app that enhances the overall brand and product experience, with information that's easy to find and full control of the machine.",
+  role:"Solo, primarily UI design, drawing on existing user and brand research to set the key features and visual language.",
+  skills:["Visual design","Brand development","Stakeholder interviews","Feature definition"],
+  more:["From interviews with users and stakeholders, the essentials were: chamber volumes, progress and time remaining, live sensor readings, auto or manual emptying, choosing which alerts to get, a community blog, learning how KALEA works, and looking up which foods it can process.","Simple shapes, lines and icons reinforce KALEA's modern brand. Subtle oranges and greens feel earthy without brown, and the brighter palette signals cleanliness, a common worry with kitchen composters."]},
+ {id:"kidskitchen",hidden:true,title:"KidsKitchen",kind:"Product · Child-scale design",for:"Product design for",bg:"var(--tomato)",fg:"var(--paper)",x:74,y:1080,w:250,r:4,cover:3,ar:"4/5",cbg:"#fff",fit:"contain",
+  blurb:"A real, working kitchen sized for a four-year-old. Running water, one cool-touch burner, a tiny fridge drawer.",
+  intro:"A safe yet fully functional version of the play kitchen, sized for young children and paired with a control app for parents. It has a small sink with running water, a single electric burner, and a shallow fridge drawer.",
+  challenge:"Design a play kitchen for children that is functional and teaches real skills in an environment suited to their needs.",
+  role:"Solo project, from research gathering through design and prototyping.",
+  skills:["Anthropometry","Task analysis","Needs analysis","Observation","Interviews","Sketching","3D modeling","Figma prototyping"],
+  more:["Play kitchens can't teach cooking, and real kitchens put kids on step stools at adult counters. Watching a three-year-old showed the gaps: carrying a cup to the bathroom sink and spilling on the way back, putting pots on the floor for lack of counter space, not being able to reach anything in the fridge.","The kitchen is sized for children aged 3 to 5, from the average measurements of a 4-year-old: 101.4 cm stature for overall height, 55.4 cm waist height for the counter, 43.1 cm frontal grip reach for the depth, and 11.4 cm hand length for the utensils. The app lets parents lock the sink, stove and fridge and play tutorials on the kitchen's screen."]},
+ // placeholders until photos and details are in
+ {id:"furniture",title:"Matchbook Shelves",kind:"Personal · Furniture",for:"A furniture build",bg:"var(--kraft)",fg:"var(--ink)",cover:22,frame:"#cc1626",pos:"50% 50%",ar:"4/5",cbg:"#f4f2ee",
+  blurb:"Stacking shelves built like matchboxes, with giant matches for legs.",intro:"Stacking shelves built like matchboxes: wood boxes that slide out like matchbox drawers, standing on giant matches with red heads. More on the build is coming soon.",skills:[]},
+ {id:"bike",title:"Bike Build",kind:"Personal · Restoration",for:"A restoration and",bg:"var(--tomato)",fg:"var(--paper)",placeholder:true,noPhTitle:true,soon:"Photos coming soon",
+  blurb:"A bike restoration and build. Photos coming soon.",intro:"A bike restoration and build. Photos and the story of the build are coming soon.",skills:[]},
+ {id:"knife",title:"Electric Knife",kind:"Product · Teardown & CAD",for:"Engineering study of an",bg:"var(--paper)",fg:"var(--ink)",x:75,y:170,w:250,r:-3,cover:5,ar:"3/2",cbg:"#1d1a16",
+  blurb:"Taking one apart and redesigning it for people with less grip strength.",
+  intro:"A teardown, 3D model and redesign of an electric knife to make it easier for everyone, and especially people with motor or strength challenges, to cut meats and breads.",
+  challenge:"Tear down, model and re-imagine an electric knife to fully understand its mechanics and make it easier to use.",
+  role:"Group project. We each did our own teardown of the existing product and collaborated on modeling and redesign.",
+  skills:["Teardown","Component study","Function structure","Affordances","Anthropometry","SolidWorks","Assembly animation"],
+  more:["The main flaws we found were the weight of the handle and the shape of the blade guard. The handle suits large hands but is hard for small hands to grip, so the redesign aims for a comfortable in-between size, and goes cordless so you aren't cutting next to an outlet.","The assembled knife measures 287 × 97 × 66 mm. The handle's contours suggest the grip, the trigger's shape and position set it apart from the blade release, and a small blade icon labels the release button."]},
+ {id:"meteor",title:"The Meteorological Institute",kind:"Architecture",for:"Architecture",bg:"var(--kraft)",fg:"var(--ink)",x:3,y:560,w:300,r:-1.5,cover:9,ar:"1/1",cbg:"#ddd",
+  blurb:"Two interlocked house-shaped buildings, research and teaching, around a sunken courtyard.",
+  intro:"Abstract, interlocked house forms, a homage to the surrounding neighborhood. Two buildings, each made of two forms, each transparent through to its core in both directions.",
+  challenge:"Design a meteorological institute for a specific program of research labs and teaching spaces.",
+  role:"Studio project: plans, sections, diagrams, digital model and physical model.",
+  skills:["Floor plans","Sections","Elevation","Sun diagram","Site plan","3D model","Physical model"],
+  more:["Labs and research sit in one building, students and classrooms in the other, with a central core of elevators, stairs, storage and restrooms. A stepped-down courtyard between them pushes people outdoors and builds community.","Each building is public on one side and turned privately away on the other. The design plays research against teaching, public against private, light against dark, and indoors against outdoors, with plenty of student work space. Repeated elements sit in the same place on every floor for wayfinding."]},
+ {id:"art",title:"Studio",wide:["img/art/01.webp", "img/art/33.webp", "img/art/04.webp", "img/art/06.webp", "img/art/08.webp", "img/art/26.webp", "img/art/13.webp", "img/art/21.webp", "img/art/36.webp", "img/art/42.webp", "img/art/34.webp"],kind:"Painting · Print · Sculpture",for:"Artwork",bg:"var(--sun)",fg:"var(--ink)",x:4,y:1210,w:250,r:-3,cover:2,ar:"4/5",
+  blurb:"Pencil, paint, printmaking, jewelry and sculpture from the last few years.",
+  intro:"A gallery of artwork made over the past few years, in a range of mediums: pencil and paper, paint, sculpture, digital, jewelry and printmaking.",skills:["Painting","Drawing","Printmaking","Jewelry","Sculpture","Digital"]},
+ {id:"print",hidden:true,title:"Magazine & Newspaper",kind:"Editorial layout",for:"Layout for",bg:"var(--pink)",fg:"var(--ink)",x:28,y:1160,w:270,r:2,cover:0,ar:"2/1",
+  blurb:"Layouts for a student art and literary magazine and the school paper.",
+  intro:"Work from a student art and literary magazine and a school newspaper: layout done mainly in Adobe InDesign, some of my physical artwork, plus logos and digital graphics.",skills:["InDesign","Editorial layout","Logos","Digital content"]},
+ {id:"photo",title:"Photography",gscale:1.4,kind:"Personal",for:"Looking around",bg:"var(--ink)",fg:"var(--paper)",x:55,y:1560,w:230,r:3.5,cover:0,ar:"4/5",
+  blurb:"Not a professional practice, just a lot of looking.",
+  intro:"Not a professional practice: a collection of personal photography and design.",skills:[]},
+].filter(p=>!p.hidden); // hidden projects stay in the source but leave the site
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const byId=id=>PROJECTS.find(p=>p.id===id);
+// unlisted drafts reached only by hash (#/wesharecare-study): a project rewritten as a research case study, shown before it replaces the live page
+const PREVIEW={"wesharecare-study":{"of": "wesharecare", "for": "UX research & design for", "kind": "UX research · Telehealth", "intro": "WeShareCare connects patients with healthcare providers through messaging and video. Its founder brought us in because patients and providers weren’t reaching each other. We researched both sides of that conversation, then redesigned the patient and provider apps around what we found.", "challenge": "The app had awkward translated copy, a broken question feature and no way back to past conversations. The founder needed a clear, evidence-based view of what to keep, what to fix and what to cut.", "role": "UX researcher and designer, on a two-person team reporting directly to the founder. Six weeks, from research plan to tested prototype.", "hero": 1, "skills": ["User research", "Stakeholder interviews", "Usability testing", "Interaction design"], "study": [{"h": "Research question", "p": ["What stops patients and providers from connecting through telehealth, and which features earn their place?", "We studied both sides. Patients answered a survey on their telehealth experiences. Providers gave in-depth interviews: a senior hospital pharmacist in Hong Kong, where hospital telehealth was still new, and a retired pediatrician from a New York City hospital."]}, {"h": "Approach", "list": [["Survey", "Patient attitudes toward telehealth, and where it frustrates them."], ["Provider interviews", "Semi-structured interviews on the patient-provider relationship."], ["UX audit", "Every screen reviewed, with each issue logged, prioritized and scoped with the founder."], ["Competitive analysis", "Amwell and MDLive, the two US market leaders, compared on price, speed and access."], ["Usability testing", "Patients and providers tested a low-fidelity prototype, and every issue they raised was addressed."]], "figs": [2], "cap": "Six-week plan, with research and design running in parallel."}, {"h": "Key findings", "ins": [["Friction ends the conversation", "When reaching someone takes effort, patients stop trying. One provider had abandoned her own patient portal after repeated lockouts and slow replies."], ["Patients want speed and continuity", "Slow replies and mismatched availability were the top complaints, yet a provider who already knows the patient adds real value. The app had to serve both."], ["Efficiency for providers became friction for patients", "Messaging tools meant to cut office workload, paired with fewer phone staff, left patients waiting longer."], ["Language and layout were the first barrier", "Awkward translated copy, harshly worded prompts, small type and no path back to past conversations got in the way from the first screen."]], "quotes": [["If it’s made convenient they do, but if it is a laborious procedure where it is hard to get in contact with someone they tend to give up.", "Retired pediatrician, New York City"], ["The design is important. The app has to be user-friendly.", "Senior pharmacist, Hong Kong"], ["I don’t want to go to the hospital, no matter what country you come from.", "Senior pharmacist, Hong Kong"]]}, {"h": "Market context", "table": [["Amwell", "Market leader. $79 per visit, waits of up to 50 minutes, and video or voice only, which excludes people with hearing impairments."], ["MDLive", "$40 to $50 per visit, a doctor guaranteed within an hour, and live chat alongside video, but limited to three areas of care."]], "p": ["Speed and choice of channel set the bar. WeShareCare needed messaging, video and phone in one place."]}, {"h": "Design decisions", "map": [["Friction ends the conversation", "A home screen with four plain actions, and simpler copy throughout, like “View medical records” instead of “Access”."], ["Speed versus continuity", "Notes can go to the soonest available provider or to one the patient has seen before."], ["Waiting without information", "A virtual waiting room with an estimated wait, and the option to leave a note instead."], ["Harsh, confusing language", "Copy rewritten, pre-written questions removed, and an unexplained caregiver-rating feature cut."], ["One channel doesn’t fit everyone", "Video and phone calls from inside any chat, and searchable chat records with subjects and dates."]], "figs": [16, 20, 23, 24], "cap": "From paper sketches to the patient-side screens."}, {"h": "Validation", "p": ["Usability testing surfaced 12 issues across the patient and provider apps, and all 12 were resolved in the next iteration."], "map": [["“Am I still in the waiting room?”", "A waiting-room banner on every page while the patient waits."], ["Leaving a note looked just like messaging", "Notes redesigned to look like email, with a subject line."], ["Tapping the wrong button in the waiting room", "“Leave waiting room” color-coded apart from every other action."], ["Picking a type, date and time across pages", "Combined into one scheduling screen."], ["Providers found “View previous patients” confusing", "Renamed “View upcoming and previous chats” to match the patient app."]], "figs": [26], "cap": "Provider app: messaging, and requesting medical records behind a privacy prompt."}]}};
+const fromPreview=id=>{const v=PREVIEW[id];return v&&Object.assign({},byId(v.of),v,{id:v.of})};
+// the research version is live; delete this line to bring back the original WeShareCare page
+Object.assign(byId('wesharecare'),fromPreview('wesharecare-study'));
+
+// six studios, in the order you walk through them. A string is a project slide; {p,k} hangs pieces k of project p,
+// each opening that project. hang = [height in svh, vertical offset in svh, tilt] cycled across the pieces.
+const STUDIOS=[
+ {id:'art',name:'Art studio',sub:'paint, print & wood',blurb:'BFA in studio art: painting, printmaking, drawing and woodworking.',
+  pieces:{p:'art',k:[0,2,3,8,16,18,1,7,25]},hang:[[56,0],[42,-9],[50,7],[38,-6],[56,0],[42,-9],[50,7],[48,-4],[40,4]]},
+ {id:'photo',name:'Photography',sub:'looking around',blurb:'Places I’ve been and things that caught my eye.',
+  pieces:{p:'photo',k:[8,19,10,47,3,13]},hang:[[46,-2],[54,4],[50,-7],[40,6]]},
+ {id:'ux',name:'UX design',sub:'research to interface',blurb:'BS in Human Factors Engineering: systems design, in-depth research, interaction design and testing.',
+  slides:['autodesk','wesharecare','zoox','hobbees']},
+ {id:'personal',name:'Personal projects',sub:'design and fabrication',blurb:'Product design, understanding fabrication and how things work.',
+  slides:['furniture','bike','knife']},
+ {id:'arch',name:'Architecture',sub:'space and structure',blurb:'Studio projects in architectural design.',
+  slides:['meteor']},
+];
+// project pages in these studios show "Coming soon" for now; their content stays here. Take a studio id out of
+// this list to open its pages again.
+const LOCK_STUDIOS=['ux','personal','arch'];
+const LOCKED=new Set(STUDIOS.filter(s=>LOCK_STUDIOS.includes(s.id)).flatMap(s=>s.slides||[]));
+const isLocked=p=>LOCKED.has(p.id)||LOCKED.has(p.of);
+const studios=$('#studios');
+STUDIOS.forEach((st,si)=>{
+  let items='';
+  if(st.slides)items=st.slides.map(id=>{
+    const p=byId(id),n=PROJECTS.indexOf(p)+1;
+    if(p.placeholder)return `<figure class="slide"><span class="lab"><b>${esc(p.title)}</b>${esc(p.kind)}</span><a class="face ph" href="#/${id}" style="--dot:${p.bg};--pf:${p.fg}" aria-label="Open ${esc(p.title)}"><span class="ph-in">${p.noPhTitle?'':`<b>${esc(p.title)}</b>`}<span>${esc(p.soon||'Case studies coming soon')}</span></span><span class="go">See the project</span></a></figure>`;
+    const [src,w,h]=IMAGES[id][p.cover]||IMAGES[id][0];
+    return `<figure class="slide"><span class="lab"><b>${esc(p.title)}</b>${esc(p.kind)}</span><a class="face${p.fit==='contain'?' mat':''}" href="#/${id}" style="--dot:${p.bg};--pos:${p.pos||'50% 50%'}" aria-label="Open ${esc(p.title)}"><img src="${src}" alt="" width="${w}" height="${h}" loading="lazy">${p.frame?`<span class="frm" style="--fc:${p.frame}"></span>`:''}<span class="go">See the project</span></a></figure>`}).join('');
+  else if(st.holds){const P=byId(st.pieces.p);items=st.holds.map((r,j)=>{const [ph,y,rot]=st.hang[j%st.hang.length];
+    return `<a class="piece hold" href="#/${P.id}" style="--r:${r};--ph:${ph}svh;--y:${y}svh;--rot:${rot||0}deg" aria-label="${esc(P.title)}: photo coming soon"><span class="frame"><span>Photo coming soon</span></span></a>`}).join('')}
+  else{const {p,k,src:sk}=st.pieces,P=byId(p);items=k.map((ix,j)=>{
+    const [src,w,h]=IMAGES[sk||p][ix],[ph,y,rot]=st.hang[j%st.hang.length];
+    return `<a class="piece" href="#/${p}" style="--r:${(w/h).toFixed(4)};--ph:${ph}svh;--y:${y}svh;--rot:${rot||0}deg" aria-label="${esc(P.title)}: piece ${j+1}"><span class="frame"><img src="${src}" alt="" width="${w}" height="${h}" loading="lazy"></span></a>`}).join('')}
+  const count=st.slides?'See the projects':'See the gallery';
+  studios.insertAdjacentHTML('beforeend',`<section class="room ${st.id}" id="studio-${st.id}" data-name="${esc(st.name)}" aria-label="${esc(st.name)}"><header class="door"><span class="no">${String(si+1).padStart(2,'0')}</span><h2>${esc(st.name)}</h2><p class="sub">${esc(st.sub)}</p><p class="blurb">${esc(st.blurb)}</p><span class="count">${count} →</span></header>${items}</section>`);
+});
+$('#top').dataset.name='Hello';$('#about').dataset.name='About';
+
+// vertical scroll drives the rail sideways: the walk is as tall as the rail is long
+const walk=$('#walk'),rail=$('#rail'),walker=$('#walker'),hud=$('#hud'),ruler=$('#ruler'),where=$('#where'),intro=$('.intro');
+const rooms=[...rail.querySelectorAll(':scope > section, #studios > section')];
+const stops=rooms.flatMap(r=>[{el:r,start:true,room:r},...[...r.querySelectorAll('.slide,.piece')].map(el=>({el,room:r}))]).filter(s=>s.start||s.el);
+stops.forEach(s=>{const b=document.createElement('button');b.type='button';if(s.start)b.className='room-start';b.setAttribute('aria-label',s.start?`Go to ${s.room.dataset.name}`:`Go to a piece in ${s.room.dataset.name}`);b.onclick=()=>goTo(s.el,!s.start);ruler.appendChild(b);s.tick=b});
+const win=ruler.querySelector('.win');
+let maxX=0,X=-1;
+// the walker crosses the screen as you go: from just past the contact links to the right edge by the end of the last studio
+let wStart=0,wEnd=0,wEndX=1,wTarget=-1,wLeft=-1;
+function placeWalker(){
+  const c=$('.contact').getBoundingClientRect(),gut=parseFloat(getComputedStyle(hud).paddingRight)||16,od=$('#studios').lastElementChild;
+  wStart=Math.min(innerWidth*.7,Math.max(innerWidth*.22,c.right+X0()+24));wEnd=innerWidth-gut-walker.offsetWidth;
+  wEndX=Math.max(1,od.offsetLeft+od.offsetWidth-innerWidth);
+}
+function layout(){placeWalker();maxX=Math.max(0,rail.scrollWidth-innerWidth);walk.style.height=maxX+innerHeight+'px';stops.forEach(s=>{const r=s.el.getBoundingClientRect();s.x=r.left+X0()+(s.start?0:r.width/2-innerWidth/2)});update(true)}
+const X0=()=>Math.max(0,X);
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function update(force){
+  const x=Math.min(maxX,Math.max(0,scrollY-walk.offsetTop));
+  if(x===X&&!force)return;X=x;
+  rail.style.transform=`translate3d(${-x}px,0,0)`;
+  if(!reduce)intro.style.setProperty('--sink',Math.min(1,x/innerWidth).toFixed(3));
+  hud.classList.toggle('out',x>innerWidth*.6);
+  wTarget=wStart+(wEnd-wStart)*Math.min(1,x/wEndX);
+  if(force||wLeft<0){wLeft=wTarget;walker.style.left=wLeft.toFixed(1)+'px'}
+  const wx=x+walker.offsetLeft+walker.offsetWidth/2,under=rooms.find(r=>wx>=r.offsetLeft&&wx<r.offsetLeft+r.offsetWidth);
+  walker.classList.toggle('light',!!under&&['photo','about','intro','outdoor'].some(c=>under.classList.contains(c)));  // light on dark walls and over the sea
+  walker.classList.toggle('sea',!!under&&['intro','outdoor'].some(c=>under.classList.contains(c)));
+  let cur=0;stops.forEach((s,i)=>{if(s.x<=x+innerWidth*.5)cur=i});
+  win.style.transform=`translateX(${stops[cur].tick.offsetLeft+.5-win.offsetWidth/2}px)`;
+  const room=stops[cur].room.dataset.name;if(where.textContent!==room)where.textContent=room;
+}
+function goTo(el,center){const r=el.getBoundingClientRect();scrollTo({top:walk.offsetTop+X+r.left-(center?(innerWidth-r.width)/2:0),behavior:reduce?'auto':'smooth'})}
+addEventListener('scroll',()=>requestAnimationFrame(()=>update()),{passive:true});
+addEventListener('resize',layout);addEventListener('load',layout);layout();
+// start the tagline a little left of where the timeline at the top starts (60% of the way in from the gutter) (desktop only; on phones it keeps the gutter)
+const alignTag=()=>{const st=document.querySelector('.statement'),ru=document.querySelector('.ruler');if(!st||!ru)return;st.style.marginLeft='';
+  if(innerWidth<=760)return;st.style.marginLeft=Math.max(0,Math.min(innerWidth*.4,(ru.getBoundingClientRect().left-parseFloat(getComputedStyle(st.parentElement).paddingLeft))*.6))+'px'};
+addEventListener('resize',alignTag);addEventListener('load',alignTag);alignTag();
+// nav links jump along the walk instead of to an anchor
+document.addEventListener('click',e=>{const a=e.target.closest('a[href="#studios"],a[href="#about"],a[href="#top"]');if(!a)return;e.preventDefault();
+  const t=a.getAttribute('href');goTo(t==='#studios'?$('#studio-art'):t==='#about'?$('#about'):intro,false)});
+// a sideways swipe on a trackpad walks too, and so do the arrow keys
+// (instant, not the page's smooth scrolling: each trackpad event would otherwise restart a smooth glide and the walk would stall)
+addEventListener('wheel',e=>{if(!chapter.hidden||e.ctrlKey)return;const u=e.deltaMode===1?16:e.deltaMode===2?innerHeight:1,dx=e.deltaX*u,dy=e.deltaY*u;
+  if(Math.abs(dx)<1||Math.abs(dx)<Math.abs(dy)*.5)return;e.preventDefault();scrollBy({top:dx+dy,behavior:'instant'})},{passive:false});
+addEventListener('keydown',e=>{if(!chapter.hidden||!lb.hidden)return;if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();scrollBy({top:(e.key==='ArrowRight'?1:-1)*innerWidth*.6,behavior:reduce?'auto':'smooth'})}});
+// with a mouse you can also grab the rail and drag it; a click without a drag still opens the project
+rail.addEventListener('pointerdown',e=>{
+  if(e.pointerType!=='mouse'||e.button!==0||e.target.closest('.me,.about,.contact,.nav'))return;
+  const sx=e.clientX,sy=scrollY;let dragged=false;
+  const move=ev=>{const dx=ev.clientX-sx;if(!dragged&&Math.abs(dx)>5){dragged=true;rail.classList.add('drag')}if(dragged)scrollTo({top:sy-dx,behavior:'instant'})};
+  const up=()=>{removeEventListener('pointermove',move);removeEventListener('pointerup',up);if(dragged)setTimeout(()=>rail.classList.remove('drag'))};
+  addEventListener('pointermove',move);addEventListener('pointerup',up);
+});
+rail.addEventListener('dragstart',e=>e.preventDefault());
+
+// ---------- the walker's skeleton and gait ----------
+// Joint curves sampled every 10% of a stride from heel strike, after Winter (walking) and Novacheck (running).
+// hip + = thigh forward, knee + = folded, ankle + = toes up. Stance ends at 60% walking, 40% running.
+// Hip angles in the studies are measured from the pelvis, which tips forward (tilt), so the thigh's angle from
+// vertical is hip - tilt; without that the foot lands too far ahead and the stride looks like an overreach.
+const GAIT={
+  walk:{hip:[30,25,15,5,-5,-10,-5,15,28,32],knee:[5,18,15,8,5,10,35,60,45,15],ankle:[0,-7,3,8,10,5,-15,-8,0,2],
+        arm:.8,elbow:20,lean:2,tilt:8,cadence:.95},
+  run:{hip:[35,28,15,0,-12,-6,15,35,46,42],knee:[22,38,34,22,18,45,85,104,82,42],ankle:[5,18,14,0,-22,-14,0,10,12,8],
+       arm:1.4,elbow:90,lean:10,tilt:12,cadence:1.42}
+};
+// standing at rest: upright, weight on the far leg, near knee just softened, arms hanging loose
+const REST={hip:{1:5,'-1':-2},knee:{1:7,'-1':1},ankle:{1:-2,'-1':1},shoulder:{1:3,'-1':-2},elbow:{1:12,'-1':8},lean:0};
+const crm=(t,a)=>{const n=a.length,x=((t%1)+1)%1*n,i=Math.floor(x),f=x-i,p0=a[(i+n-1)%n],p1=a[i],p2=a[(i+1)%n],p3=a[(i+2)%n];
+  return .5*((2*p1)+(-p0+p2)*f+(2*p0-5*p1+4*p2-p3)*f*f+(-p0+3*p1-3*p2+p3)*f*f*f)};
+const D=Math.PI/180,HIP=[15,27.6],THIGH=13.4,SHIN=13.6,SHOULDER=[15.2,14.8],ELBOW=21.4,FLOOR=57.1;
+// rotate a point by deg (SVG sense, clockwise) around the origin
+const rot=(x,y,a)=>{const c=Math.cos(a*D),s=Math.sin(a*D);return [x*c-y*s,x*s+y*c]};
+function gaitRig(root){
+  const q=(s,el)=>el.querySelector(s);
+  return {body:q('.body',root),torso:[...root.querySelectorAll('.torso')],head:q('.head',root),
+    legs:[...root.querySelectorAll('[data-leg]')].map(g=>({k:+g.dataset.leg,thigh:q('.thigh',g),shin:q('.shin',g),foot:q('.foot',g)})),
+    arms:[...root.querySelectorAll('[data-arm]')].map(g=>({k:+g.dataset.arm,upper:q('.upper',g),fore:q('.fore',g)}))};
+}
+// p = stride phase (0..1, cycles), r = 0 walk .. 1 run, amp = 0 standing .. 1 moving
+function gaitPose(rig,p,r,amp){
+  const W=GAIT.walk,R=GAIT.run,mix=(a,b)=>a+(b-a)*r,ang=(tab,ph)=>mix(crm(ph,W[tab]),crm(ph,R[tab]))*amp,still=1-amp;
+  let lowest=-1e9;const hip={};
+  rig.legs.forEach(({k,thigh,shin,foot})=>{
+    const ph=p+(k>0?0:.5),h=ang('hip',ph)-mix(W.tilt,R.tilt)*amp+REST.hip[k]*still,kn=ang('knee',ph)+REST.knee[k]*still,an=ang('ankle',ph)+REST.ankle[k]*still;hip[k]=h;
+    thigh.setAttribute('transform',`rotate(${(-h).toFixed(2)} ${HIP})`);
+    shin.setAttribute('transform',`rotate(${kn.toFixed(2)} 15 41)`);
+    foot.setAttribute('transform',`rotate(${(-an).toFixed(2)} 15 54.6)`);
+    // forward kinematics down to the heel and toe, so whichever touches lowest is planted on the floor:
+    // that gives heel strike, a flat foot through mid-stance, and a roll onto the toe at push-off
+    const a1=-h,a2=a1+kn,a3=a2-an,[kx,ky]=rot(0,THIGH,a1),[sx,sy]=rot(0,SHIN,a2);
+    for(const [fx,fy] of [[-1.9,2.5],[5,2.5]]){const [,y]=rot(fx,fy,a3);lowest=Math.max(lowest,HIP[1]+ky+sy+y)}
+  });
+  // arms pump against the legs: each shoulder mirrors the opposite thigh, and the elbow folds tighter as the
+  // hand drives forward and opens a little as it swings back past the hip
+  const as=mix(W.arm,R.arm),el0=mix(W.elbow,R.elbow)*amp;
+  rig.arms.forEach(({k,upper,fore})=>{
+    const sh=(hip[-k]-5*r)*as*amp+REST.shoulder[k]*still,el=el0+mix(.15,.25)*sh*amp+REST.elbow[k]*still;
+    upper.setAttribute('transform',`rotate(${(-sh).toFixed(2)} ${SHOULDER})`);
+    fore.setAttribute('transform',`rotate(${(-el).toFixed(2)} ${SHOULDER[0]} ${ELBOW})`);
+  });
+  // the trunk leans into a run and the head counters most of it, so the gaze stays level
+  const lean=mix(W.lean,R.lean)*amp+REST.lean*still;
+  rig.torso.forEach(g=>g.setAttribute('transform',`rotate(${lean.toFixed(2)} ${HIP})`));
+  rig.head.setAttribute('transform',`rotate(${(-lean*.7).toFixed(2)} 15.4 12.6)`);
+  // the spine rises and falls with the stride: planted foot sets the low point, and running adds a float
+  // through the two flight phases (40-50% and 90-100%) when neither foot is down
+  const fl=x=>x>0&&x<.1?Math.sin(x/.1*Math.PI):0,q=((p%1)+1)%1,lift=r*amp*1*(fl(q-.4)+fl(q-.9));
+  rig.body.setAttribute('transform',`translate(0 ${(FLOOR-lowest-lift).toFixed(2)})`);
+}
+
+// the walker: she walks at a real cadence while you scroll, breaks into a run when you scroll fast,
+// stands still when you stop, and turns around when you scroll back. You can also pick her up: she dangles
+// from the cursor and kicks and flails, swinging as you move her, and when you let go she drops back to the
+// ground, lands with a little squash, and walks back to her place
+(()=>{
+  const w=$('#walker'),rig=gaitRig(w),stage=w.parentElement;
+  const fArms=[...w.querySelectorAll('[data-farm]')].map(g=>({k:+g.dataset.farm,g,fore:g.querySelector('.f-fore')})),
+    fLegs=[...w.querySelectorAll('[data-fleg]')].map(g=>({k:+g.dataset.fleg,thigh:g.querySelector('.f-thigh'),shin:g.querySelector('.f-shin')}));
+  let last=X,p=0,amp=0,r=0,v=0,face=1,prev=0,raf=0,moved=0,push=0;
+  // picked up: held, airborne (held or falling), height above the ground dy (px, negative is up), fall speed vy,
+  // drift vx, swing angle ang (deg) and its speed va, where on her she was grabbed (gx,gy), the pointer (px,py)
+  let held=false,air=false,back=false,dy=0,vy=0,vx=0,ang=0,va=0,gx=17,gy=8,px=0,py=0,pvx=0,pvy=0,lpx=0,lpy=0,sq=0,ft=0;
+  w.style.transform='scaleX(1)';  // she starts facing right, the way the walk goes
+  gaitPose(rig,0,0,0);
+  const ground=()=>stage.getBoundingClientRect().top+w.offsetTop;
+  const kick=()=>{if(!raf){prev=0;raf=requestAnimationFrame(tick)}};
+  w.addEventListener('pointerdown',e=>{
+    if(e.button>0)return;e.preventDefault();e.stopPropagation();
+    w.setPointerCapture(e.pointerId);
+    gx=Math.max(6,Math.min(w.offsetWidth-6,e.clientX-wLeft));gy=Math.max(4,e.clientY-(ground()+dy));
+    held=air=true;back=false;px=lpx=e.clientX;py=lpy=e.clientY;pvx=pvy=0;w.classList.add('held');
+    w.style.transformOrigin=`${gx}px ${gy}px`;kick();
+  });
+  w.addEventListener('pointermove',e=>{if(held){px=e.clientX;py=e.clientY}});
+  const drop=()=>{if(!held)return;held=false;w.classList.remove('held');
+    vy=Math.max(-900,Math.min(900,pvy));vx=Math.max(-500,Math.min(500,pvx*.6))};   // a flick carries into the fall
+  w.addEventListener('pointerup',drop);w.addEventListener('pointercancel',drop);w.addEventListener('lostpointercapture',drop);
+  function tick(now){
+    const dt=Math.min(.05,(now-(prev||now))/1000)||.016;prev=now;
+    const dx=X-last;last=X;
+    // she only turns around for a deliberate scroll back (about 40px), so a jitter at load or a tiny nudge doesn't spin her
+    push=push*Math.exp(-dt*3)+dx;if(Math.abs(dx)>.5)moved=now;
+    if(push<-40)face=-1;else if(push>8)face=1;
+    v+=(Math.abs(dx)/dt-v)*Math.min(1,dt*5);
+    const scrolling=now-moved<160;
+    if(air){
+      if(held){
+        // follow the pointer, never below the ground; the swing is a damped pendulum pushed by the hand's acceleration
+        const nvx=(px-lpx)/dt,nvy=(py-lpy)/dt;lpx=px;lpy=py;
+        const acc=(nvx-pvx)/dt;pvx+=(nvx-pvx)*Math.min(1,dt*12);pvy+=(nvy-pvy)*Math.min(1,dt*12);
+        va+=(-90*ang-7*va-acc*.012)*dt;
+        wLeft=px-gx;dy=Math.min(0,py-gy-ground());
+      }else{
+        vy+=2600*dt;dy+=vy*dt;wLeft+=vx*dt;vx*=Math.exp(-dt*2);
+        va+=(-60*ang-5*va)*dt;
+        if(dy>=0){dy=0;vy=0;air=false;back=true;sq=Math.min(1,.5+Math.abs(ang)/90);ang=va=0;w.style.transformOrigin=''}
+      }
+      ang=Math.max(-70,Math.min(70,ang+va*dt));
+      // she turns to face you while she's up, flailing in a steady loop: arms waving up and out of step with each
+      // other, legs kicking out in turn. Every limb is rigid between joints and only turns at the shoulder, elbow,
+      // hip and knee. Each elbow folds in step with its shoulder (more as the arm drops, less as it rises), so the
+      // forearms pump up and out beside her head without whipping, and the knees bend in step with the thighs
+      ft+=dt;
+      if(air){
+        const sw=Math.max(-40,Math.min(40,ang)),T=ft*.9;
+        fArms.forEach(A=>{const {k,g,fore}=A,sx=15+4.1*k,u=Math.min(132,100+32*Math.sin(T*11+(k>0?2.1:0))+sw*.4*k);   // kept out to the side, clear of her head
+          g.setAttribute('transform',`rotate(${(u*-k).toFixed(1)} ${sx} 15)`);
+          // the forearm has weight: it lags when the upper arm speeds up or stops, gravity pulls it toward hanging
+          // down, and a loose muscle pull keeps it a little bent. The elbow only folds one way (never past straight)
+          // and never so far that the hand reaches her head
+          const du=A.pu===undefined?0:(u-A.pu)/dt,acc=A.pdu===undefined?0:(du-A.pdu)/dt;A.pu=u;A.pdu=du;
+          A.e??=20;A.de??=0;
+          A.de+=(90*(25-A.e)-11*A.de-acc*.35-140*Math.sin((u+A.e)*D))*dt;A.e+=A.de*dt;
+          const lim=Math.min(110,160-u);if(A.e<0){A.e=0;A.de*=-.3}else if(A.e>lim){A.e=lim;A.de*=-.3}
+          fore.setAttribute('transform',`rotate(${(A.e*-k).toFixed(1)} ${sx} 21.4)`)});
+        fLegs.forEach(({k,thigh,shin})=>{const hx=15+2*k,ph=T*9+(k>0?Math.PI:0),a=-(12+16*Math.sin(ph))*k-sw*.6;
+          thigh.setAttribute('transform',`rotate(${a.toFixed(1)} ${hx} 29.5)`);
+          shin.setAttribute('transform',`rotate(${(-a*.35).toFixed(1)} ${hx-.1*k} 41)`)});
+      }
+      if(air)amp=1;
+    }
+    if(!air){
+      // after a drop she walks back to her spot at an easy pace, facing the way she goes
+      const gap0=wTarget-wLeft;if(back&&Math.abs(gap0)<1)back=false;
+      if(back&&!scrolling)face=gap0<0?-1:1;
+      const going=scrolling||back?1:0;
+      amp+=(going-amp)*Math.min(1,dt*(going?6:3.5));
+      r+=(Math.min(1,Math.max(0,(v-700)/900))*(scrolling?1:0)-r)*Math.min(1,dt*3);
+      p+=dt*(GAIT.walk.cadence+(GAIT.run.cadence-GAIT.walk.cadence)*r)*Math.max(amp,.3)*(amp>.01?1:0);
+      gaitPose(rig,p,r,amp);
+      // she eases toward her spot on screen, so a wheel notch becomes a few steps, not a hop
+      if(back)wLeft+=Math.max(-70*dt,Math.min(70*dt,gap0));else wLeft+=gap0*Math.min(1,dt*3.5);
+    }
+    sq*=Math.exp(-dt*7);   // the landing squash springs back
+    w.classList.toggle('up',dy<-36);w.classList.toggle('facing',air);
+    w.style.left=wLeft.toFixed(1)+'px';
+    w.style.transform=(air?`translate(0,${dy.toFixed(1)}px) rotate(${ang.toFixed(1)}deg) `:'')+`scale(${((air?1:face)*(1+.12*sq)).toFixed(3)},${(1-.22*sq).toFixed(3)})`;
+    const gap=wTarget-wLeft;
+    raf=air||back||sq>.01||amp>.01||scrolling||Math.abs(gap)>.3?requestAnimationFrame(tick):0;if(!raf){prev=0;v=0}
+  }
+  addEventListener('scroll',kick,{passive:true});
+})();
+
+
+// pelicans: heavy brown pelicans riding a steady track across the dusk, mostly gliding, flapping in slow ripples
+// down a loose V. Drawn on a canvas each frame from a silhouette traced from Ava's photo; one rAF loop on real
+// elapsed time keeps the motion the same at any refresh rate.
+(()=>{
+  const sky=document.querySelector('.sky'),intro=document.querySelector('.intro');
+  if(!sky||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  const cv=document.createElement('canvas'),ctx=cv.getContext('2d');sky.appendChild(cv);
+  cv.style.cssText='position:absolute;inset:0;width:100%;height:100%';
+  const D=Math.PI/180,TAU=Math.PI*2,rnd=(a,b)=>a+Math.random()*(b-a),lerp=(a,b,k)=>a+(b-a)*k;
+
+  // ---- wing pose (beat depth and the bowed glide from Ava's videos). The flap is a plain sine: shoulder angle e1 swings around level, and the hand follows the arm a
+  // little late (a damped, lagging sine) so the wing curves through the stroke instead of hinging. Glide is fixed.
+  const GLIDE={e1:5,e2:-15,sw:6};                      // arms a touch up, hands drooping: the bowed pelican glide
+  // upstroke: the hand sweeps back and folds a little; downstroke: the wing spreads wide and the tip trails
+  const flapPose=ph=>({e1:8+48*Math.cos(TAU*ph),e2:-18*Math.sin(TAU*ph+.9)-6,sw:10+10*Math.sin(TAU*ph)});
+  const pose=(ph,g)=>{const f=flapPose(ph);return {e1:lerp(f.e1,GLIDE.e1,g),e2:lerp(f.e2,GLIDE.e2,g),sw:lerp(f.sw,GLIDE.sw,g)}};
+
+  // ---- drawing, in bird units (about 135 long, facing left)
+  const BODY=[-68.4,9.8,-68.0,10.6,-64.3,10.6,-62.6,8.9,-57.6,8.9,-56.3,7.3,-52.6,7.3,-51.3,5.6,-47.6,5.6,-46.3,3.9,-42.5,3.9,-41.3,2.3,-37.5,2.3,-36.3,0.6,-32.5,0.6,-30.0,3.1,-30.0,5.2,-27.5,5.6,-26.3,7.3,-15.8,7.3,-14.6,8.9,-5.8,8.9,-4.6,10.6,17.6,10.6,18.8,12.3,34.3,12.3,36.8,14.8,37.2,17.3,39.3,17.3,43.9,20.6,47.6,20.6,48.9,22.3,51.0,22.3,53.9,25.6,57.7,25.6,58.9,27.3,61.0,27.3,63.9,24.0,66.4,23.6,66.4,21.5,62.7,17.7,59.7,16.9,59.7,13.1,58.1,11.9,58.1,8.1,56.4,6.9,56.4,1.4,54.7,0.2,54.7,-1.9,51.0,-5.7,47.2,-5.7,46.0,-7.3,37.2,-7.3,35.9,-9.0,25.5,-9.0,24.3,-10.7,17.2,-10.7,12.6,-14.0,8.8,-14.0,7.6,-15.7,3.8,-15.7,2.5,-17.4,-1.2,-17.4,-2.5,-19.0,-11.2,-19.0,-12.5,-20.7,-21.3,-20.7,-22.5,-22.4,-44.6,-22.4,-46.3,-20.7,-49.2,-20.7,-50.9,-22.4,-53.0,-22.4,-54.2,-24.0,-56.3,-24.0,-56.7,-21.5,-54.2,-21.1,-53.0,-19.4,-44.2,-19.4,-43.0,-17.8,-40.9,-17.8,-39.6,-19.4,-38.0,-17.8,-25.8,-17.8,-25.0,-14.9,-27.5,-12.4,-29.6,-12.4,-34.2,-7.3,-39.6,-5.7,-42.5,-2.3,-44.6,-2.3,-45.9,-0.7,-48.0,-0.7,-49.2,1.0,-54.7,2.7,-57.6,6.0,-61.3,6.0,-62.2,7.3];
+  function body(){
+    const n=BODY.length/2,P=i=>[BODY[(i%n)*2],BODY[(i%n)*2+1]];
+    ctx.beginPath();let [x0,y0]=P(0),[x1,y1]=P(1);ctx.moveTo((x0+x1)/2,(y0+y1)/2);
+    for(let i=1;i<=n;i++){const [ax,ay]=P(i),[bx,by]=P(i+1);ctx.quadraticCurveTo(ax,ay,(ax+bx)/2,(ay+by)/2)}
+    ctx.fill();
+  }
+  // The wing is a real brown-pelican planform (seen from above: long broad arm, forward-bent wrist, slotted
+  // fingertip primaries), measured as [span, chord] from the shoulder. It is lifted in 3D (arm by e1, hand by a
+  // further e2, hand swept back by sw) and projected for a camera a little below and behind the bird, so its
+  // shape foreshortens the way a real wing does: broad when raised, a thin edge when level, broad again below.
+  const PLAN=[[0,-9],[14,-10],[28,-12],[40,-14.5],[46,-14],[58,-11],[72,-7],[86,-3],[98,0],[106,3],
+    [107,5],[103,6],[104,8.5],[99,8.5],[100,11],[94,11],[94.5,13.5],[88,13.5],[88,16],[81,16.5],
+    [72,18.5],[58,20.5],[44,21.5],[30,21],[16,20],[6,17.5],[0,15]];
+  const WRIST=44,TILT=Math.sin(14*D),YAW=Math.sin(13*D);
+  function wing(e1,e2,sw,side,ox,oy,len){
+    const c1=Math.cos(e1*D),s1=Math.sin(e1*D),c2=Math.cos((e1+e2)*D),s2=Math.sin((e1+e2)*D),cs=Math.cos(sw*D),ss=Math.sin(sw*D);
+    ctx.beginPath();
+    PLAN.forEach(([sp,ch],i)=>{
+      sp*=len;ch*=len;let x,y,z;const w=WRIST*len;
+      if(sp<=w){x=ch;y=-sp*s1;z=sp*c1}
+      else{const h=sp-w,hx=ch+h*ss,hs=h*cs;x=hx;y=-w*s1-hs*s2;z=w*c1+hs*c2}
+      z*=side;const X=ox+x+z*YAW,Y=oy+y+z*TILT;
+      i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);
+    });
+    ctx.closePath();ctx.fill();
+  }
+  // one bird on screen at (x,y), s screen pixels per bird unit. flip mirrors it to fly right; pitch tilts the
+  // nose up (positive) or down; haze fades it toward the sky color with distance
+  function drawBird(d){
+    const k=d.s*dpr,fx=d.flip?-1:1,c=Math.cos(d.pitch*fx)*k,sn=Math.sin(d.pitch*fx)*k;
+    ctx.setTransform(c*fx,sn*fx,-sn,c,dpr*d.x,dpr*d.y);ctx.globalAlpha=d.alpha;
+    const h=d.haze;ctx.fillStyle=`rgb(${Math.round(23+177*h)},${Math.round(19+131*h)},${Math.round(27+103*h)})`;
+    const p=d.p;wing(p.e1-4,p.e2,p.sw,-1,16,-9,1.2);body();wing(p.e1,p.e2,p.sw,1,8,-6,1.28);
+  }
+
+  // ---- the birds fly in a 3D airspace, seen as if from a cliff above the water. Every bird has a world position
+  // (X across, Yd below eye level, Z away from the viewer) projected through one camera: screen size is F/Z, so a
+  // bird twice as far is half the size, its wingbeats half as big, and its motion across the screen half as fast.
+  // Far birds are also fainter and hazier against the sky. Each pass picks a path through that space: a flock
+  // sweeps in diagonally from the distance (small, slow, high) to pass close by (large, fast, low), or the opposite,
+  // pulling away and fading into the haze, or crosses at one depth. All pelicans fly at about the same real speed,
+  // so near crossings are quick and far ones are slow.
+  //
+  // Flight follows Ava's videos and notes on brown pelicans: long steady glides broken by a few deliberate
+  // wingbeats (about 2.1 a second), loose formations, small changes in altitude, nothing in lockstep. Each bird
+  // keeps its own wing timing and usually picks up a bout from the bird ahead a moment later. Slots in the
+  // formation are soft: birds drift forward and back on the wind, and now and then a bird from the side moves up
+  // to take the lead while the old leader drops back into the slipstream. Nothing follows a sine or random jitter:
+  // speed, altitude and slot drift come from smooth springs chasing targets that change at uneven intervals.
+  let W=0,H=0,dpr=1,F=1,CX=0,CY=0;
+  function size(){W=intro.clientWidth;H=intro.clientHeight;dpr=Math.min(2,devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;
+    F=Math.max(W*.9,H*.7);CX=W*.5;CY=H*.14}
+  const ZFAR=14000,ZNEAR=2000,V=620;                      // depth range in bird units (a bird is ~135 long); flight speed
+  const toWorld=(x,y,Z)=>[(x-CX)*Z/F,(y-CY)*Z/F,Z];
+
+  // a smooth wander: a soft spring chasing a target in [-1,1] that moves to a new spot every few seconds
+  const drift=(lo,hi,w)=>({v:0,dv:0,tg:0,tt:0,lo,hi,w});
+  function stepDrift(d,dt){if((d.tt-=dt)<=0){d.tg=rnd(-1,1);d.tt=rnd(d.lo,d.hi)}
+    d.dv+=(d.w*d.w*(d.tg-d.v)-1.6*d.w*d.dv)*dt;d.v+=d.dv*dt;return d.v}
+  const wings=lead=>({flap:false,ph:.75,beats:0,glide:lead?rnd(.5,4):1e9,g:1,tempo:2.1,cue:-1,started:false});
+  // one bird's wings: a bout of beats, each ending as the wings pass level, then a long glide; the wings ease into
+  // and out of the glide over about a second
+  function stepWings(w,f,lead,dt){
+    w.started=false;
+    if(w.flap){const before=w.ph;w.ph+=dt*w.tempo;
+      if(Math.floor(w.ph-.75)>Math.floor(before-.75)&&--w.beats<=0){w.flap=false;w.ph=Math.floor(w.ph-.75)+.75;
+        w.glide=lead?rnd(4.5,8)*(f.low?1.4:1):1e9}}                      // only the leader starts a bout
+    else if(w.cue>=0&&(w.cue-=dt)<0||(w.glide-=dt)<=0){
+      w.flap=true;w.started=true;w.cue=-1;w.beats=f.low?2:Math.round(rnd(2,4));w.tempo=rnd(1.95,2.3)}
+    w.g+=((w.flap?0:1)-w.g)*(1-Math.exp(-dt*(w.flap?2.2:1.6)));
+  }
+
+  // formation shapes from the videos: a lopsided V, a check mark with a short arm, one diagonal line, or a long
+  // loose string. Birds sit about two wingspans apart along each arm; an arm trails back (along the flight
+  // direction), out to the side (across it) and steps down or up, so the shape reads from the cliff above.
+  const SHAPES=['v','v','check','line','string'];
+  function slotsFor(n,shape,skein){
+    const lower=shape==='v'?Math.round((n-1)*rnd(.5,.7)):shape==='check'?n-1-Math.round(rnd(1,2)):
+      shape==='line'?n-1:skein?n-1-Math.round(rnd(0,4)):n-1-Math.round(rnd(0,2));
+    const ang={v:[rnd(26,36),rnd(18,28)],check:[rnd(30,42),rnd(10,20)],line:[rnd(24,38),0],string:[rnd(8,14),rnd(4,10)]}[shape];
+    const step=skein?rnd(190,240):rnd(160,200),arms={1:{x:0,y:0,a:ang[0],c:rnd(-2.5,2.5),r:0},'-1':{x:0,y:0,a:ang[1],c:rnd(-2,2),r:0}};
+    const slots=[{back:0,lat:0,drop:0,ahead:-1}],last={1:0,'-1':0};
+    for(let i=1;i<n;i++){
+      const arm=i<=lower?1:-1,A=arms[arm],d=step*rnd(.88,1.12),t=(A.a+A.c*A.r)*D;
+      A.r++;A.x+=d*Math.cos(t);A.y+=d*Math.sin(t);
+      slots.push({back:A.x,lat:A.y*arm*.9,drop:A.y*.85*arm+(shape==='string'?10*Math.sin(A.r*.9):0),ahead:last[arm],arm,rank:A.r});
+      last[arm]=i;
+    }
+    return slots;
+  }
+  function setShape(f,shape){
+    f.shape=shape;f.slots=slotsFor(f.birds.length||f.n,shape,f.kind==='skein');
+    f.flat=shape==='string'?0:rnd(.1,.25);
+    f.gaps=f.slots.map(()=>drift(2,5,.6));   // each gap to the bird ahead stretches and closes on its own
+  }
+  function layout(f){
+    const skein=f.kind==='skein';
+    f.n=skein?Math.round(rnd(16,26)):Math.round(rnd(...f.count));f.birds=[];
+    setShape(f,f.low||skein?'string':SHAPES[Math.floor(Math.random()*SHAPES.length)]);
+    f.birds=f.slots.map((sl,i)=>({slot:i,size:rnd(.94,1.06),w:wings(i===0),alt:0,valt:0,fwd:0,pitch:0,
+      off:{b:sl.back,l:sl.lat,d:sl.drop},db:drift(1.5,3.5,.8),dl:drift(1.8,4,.7),dd:drift(1.8,4,.7)}));
+    f.reshape=rnd(8,16);
+  }
+  // mid-flight the flock can fly into a V and later stretch back out of it into a line or string. New slots are
+  // dealt in the birds' current front-to-back order (the leader keeps the lead): leaving a V, the two arms merge
+  // into one line, alternating, and flying into a V, the line splits alternately onto the two arms, so every bird
+  // only slides a little and nobody bunches up
+  function reshape(f){
+    setShape(f,f.shape==='v'?(Math.random()<.5?'line':'string'):'v');
+    const arms={};f.slots.forEach((sl,i)=>{if(i)(arms[sl.arm]=arms[sl.arm]||[]).push(i)});
+    for(const k in arms)arms[k].sort((p,q)=>f.slots[p].rank-f.slots[q].rank);
+    const used={1:0,'-1':0},size={1:(arms[1]||[]).length,'-1':(arms[-1]||[]).length};
+    f.birds.filter(b=>b.slot!==0).sort((p,q)=>p.off.b-q.off.b).forEach(b=>{
+      // the arm that is least filled so far, keeping the bird's own side on a tie
+      const fill=k=>size[k]?used[k]/size[k]:2,side=b.off.l>=0?1:-1;
+      const k=fill(1)<fill(-1)?1:fill(-1)<fill(1)?-1:(size[side]?side:-side);
+      b.slot=arms[k][used[k]++];
+    });
+  }
+  function makeFlock(o){return {...o,birds:[],slots:[],t:0,wait:rnd(...o.firstWait)}}
+  function launch(f,tries=0){
+    const kind=f.kinds[Math.floor(Math.random()*f.kinds.length)],left=Math.random()<.65,low=kind!=='far'&&kind!=='skein'&&Math.random()<f.lowChance;
+    const off=left?-1:1,edgeIn=left?W+80:-80,edgeOut=left?-80:W+80,inside=()=>W*(left?rnd(.7,1):rnd(0,.3));
+    let a,b;   // [screen x, screen y, Z] at the start and end of the pass
+    const nearY=()=>H*(low?rnd(.66,.72):rnd(.38,.6)),farY=()=>H*rnd(.16,.3);
+    if(kind==='approach'){a=[inside(),farY(),rnd(9000,ZFAR)];b=[edgeOut,nearY(),rnd(ZNEAR,3200)]}
+    else if(kind==='recede'){a=[edgeIn,nearY(),rnd(ZNEAR,3200)];b=[inside(),farY(),rnd(9000,ZFAR)]}
+    else{const Z=kind==='skein'?rnd(10000,13500):kind==='far'?rnd(8000,13000):rnd(3500,9000),Z2=Z*rnd(.8,1.2),y=H*(low?rnd(.68,.74):rnd(.2,.5));
+      a=[edgeIn,y,Z];b=[edgeOut,y+H*rnd(-.06,.06),Z2]}
+    f.P0=toWorld(...a);f.P1=toWorld(...b);f.kind=kind;f.low=low;
+    const dx=f.P1[0]-f.P0[0],dz=f.P1[2]-f.P0[2],hl=Math.hypot(dx,dz);
+    // a path pointed too straight at (or away from) the viewer stacks the formation into a column: pick again
+    if(Math.abs(dx)<Math.abs(dz)*1.1&&tries<12)return launch(f,tries+1);
+    // most paths curve: the middle of the path bows sideways (a gentle turn) and a little up or down
+    const bend=Math.random()<.75?rnd(-.3,.3):0,M=[0,1,2].map(i=>(f.P0[i]+f.P1[i])/2);
+    f.C=[M[0]-dz/hl*bend*hl,M[1]+rnd(-.12,.12)*hl*.3,M[2]+dx/hl*bend*hl];
+    f.D=(Math.hypot(dx,f.P1[1]-f.P0[1],dz)+Math.hypot(...f.C.map((c,i)=>c-f.P0[i]))+Math.hypot(...f.C.map((c,i)=>f.P1[i]-c)))/2;
+    f.v=V*rnd(.9,1.1);f.flip=!left;
+    f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(10,20);layout(f);
+  }
+  // a point on the curved path (a quadratic curve through C), and the path's level direction there; past either
+  // end it carries straight on
+  function pathAt(f,u){
+    const {P0,C,P1}=f,k=Math.min(1,Math.max(0,u)),
+      T=[0,1,2].map(i=>2*(1-k)*(C[i]-P0[i])+2*k*(P1[i]-C[i])),Q=[0,1,2].map(i=>(1-k)*(1-k)*P0[i]+2*(1-k)*k*C[i]+k*k*P1[i]);
+    if(u!==k)for(let i=0;i<3;i++)Q[i]+=T[i]*(u-k);
+    const l=Math.hypot(T[0],T[2])||1;return [Q,T[0]/l,T[2]/l];
+  }
+  function stepFlock(f,dt,out){
+    if(f.wait>0){if((f.wait-=dt)<=0)launch(f);else return}
+    f.t+=dt;f.u+=f.v*(1+.1*stepDrift(f.gust,dt))*dt/f.D;
+    const u=f.u,air=(f.low?35:95)*stepDrift(f.air,dt);
+    // now and then a bird from the side moves up to lead, and the leader drops back into its slot
+    // a lead change only happens as the leader opens a bout of wingbeats
+    if((f.swap-=dt)<=0&&f.birds.find(b=>b.slot===0)?.w.started){f.swap=rnd(14,26);
+      const lead=f.birds.find(b=>b.slot===0),cand=f.birds.filter(b=>f.slots[b.slot].rank===1);
+      if(lead&&cand.length){const c=cand[Math.floor(Math.random()*cand.length)];[lead.slot,c.slot]=[c.slot,0];c.w.glide=Math.max(c.w.glide,2)}}
+    // reshaping also waits for the leader to open a bout, so the whole flock moves into the new shape under power
+    if((f.reshape-=dt)<=0&&!f.low&&f.kind!=='skein'&&f.birds.find(b=>b.slot===0)?.w.started){f.reshape=rnd(10,20);reshape(f)}
+    const bySlot=[];for(const b of f.birds)bySlot[b.slot]=b;
+    // where each slot sits right now: every gap along an arm is its own length times a factor wandering
+    // between about 0.55 and 1.45, so neighbours are always closing up or falling back
+    const mo=1-f.flat*Math.min(1,f.t/40)+.2*stepDrift(f.morph,dt),T=[{b:0,l:0,d:0}];
+    for(let i=1;i<f.slots.length;i++){const sl=f.slots[i],a=f.slots[sl.ahead],t=T[sl.ahead],g=1+.5*stepDrift(f.gaps[i],dt*(f.birds.find(q=>q.slot===i)?.w.g<.5?2.2:.6));
+      T[i]={b:t.b+(sl.back-a.back)*g,l:t.l+(sl.lat-a.lat)*g*mo,d:t.d+(sl.drop-a.drop)*g*mo}}
+    const fade=f.kind==='approach'?Math.min(1,u*5):f.kind==='recede'?Math.min(1,Math.max(0,(1-u)*5)):1;
+    let visible=false;
+    for(const b of bySlot){
+      const sl=f.slots[b.slot],lead=b.slot===0;
+      stepWings(b.w,f,lead,dt);
+      // the leader always opens a bout out of the glide; each bird behind joins a moment after the bird ahead,
+      // so the beat runs down the line in order
+      if(lead&&b.w.glide>1e8)b.w.glide=rnd(1,3);
+      if(!lead&&b.w.glide<1e8&&!b.w.flap)b.w.glide=1e9;
+      if(!lead&&bySlot[sl.ahead].w.started&&!b.w.flap)b.w.cue=rnd(.2,.45);
+      // flapping lifts and pushes forward, gliding settles and eases back; springs keep the bird near its slot
+      const fl=1-b.w.g;
+      b.valt+=((fl*-11+(1-fl)*(f.low?.6:2.2)-b.alt*.12)-b.valt)*(1-Math.exp(-dt*.6));b.alt+=b.valt*dt;
+      b.fwd+=((lead?-6:-40)*fl-b.fwd)*(1-Math.exp(-dt*.5));
+      // the formation never sets: gliding or flapping, every bird keeps drifting around its slot on the wind
+      // the big reshuffles happen while flapping: each new bout picks fresh targets for this bird and its gap, and it
+      // moves to them quickly under power; in a glide it only eases slowly
+      if(b.w.started){b.db.tt=b.dl.tt=b.dd.tt=0;f.gaps[b.slot].tt=0}
+      const k=lead?.5:1,e=1-Math.exp(-dt*lerp(1.8,.25,b.w.g)),tg=T[b.slot];
+      b.off.b+=(tg.b+50*stepDrift(b.db,dt)*k-b.off.b)*e;
+      b.off.l+=(tg.l+70*stepDrift(b.dl,dt)*k-b.off.l)*e;
+      b.off.d+=(tg.d+40*stepDrift(b.dd,dt)*k-b.off.d)*e;
+      // each bird sits on the path itself, a little behind the leader, so the line follows the curve; its side
+      // offset is taken across the path's direction at that point
+      const back=b.off.b+b.fwd,[P,tx,tz]=pathAt(f,u-back/f.D);
+      // birds that have sat on top of each other for more than a moment ease apart (see the end of stepFlock)
+      if(b.sep===undefined){b.sep=0;b.sepTg=0;b.ov=0}
+      b.sepTg*=Math.exp(-dt/14);b.sep+=(b.sepTg-b.sep)*(1-Math.exp(-dt*.9));
+      const X=P[0]-tz*b.off.l,Z=Math.max(400,P[2]+tx*b.off.l),Yd=P[1]+air+b.off.d+b.alt+b.sep;
+      const sc=F/Z,x=CX+X*sc,y=CY+Yd*sc,s=sc*b.size;
+      // the body rises a touch on each downstroke; the nose follows the bird's own climb or sink
+      const bob=-2.2*Math.sin(TAU*b.w.ph)*(1-b.w.g)*s;
+      b.pitch+=(Math.max(-.14,Math.min(.14,-b.valt/45))-b.pitch)*(1-Math.exp(-dt*2));
+      const near=Math.min(1,Math.max(0,(ZFAR-Z)/(ZFAR-ZNEAR)));b.sx=x;b.sy=y;b.ss=s;b.sc=sc;
+      if(x>-300&&x<W+300&&fade>0){visible=true;
+        out.push({Z,x,y:y+bob,s,p:pose(b.w.ph,b.w.g),pitch:b.pitch,flip:f.flip,alpha:fade*(.5+.45*near),haze:(1-near)*.55})}
+    }
+    // a brief overlap is fine; after about a second the bird further back drifts up or down out of the stack
+    for(const b of f.birds)b.hit=null;
+    for(let i=0;i<f.birds.length;i++)for(let j=i+1;j<f.birds.length;j++){const p=f.birds[i],q=f.birds[j],m=Math.max(p.ss,q.ss);
+      if(Math.abs(p.sx-q.sx)<50*m&&Math.abs(p.sy-q.sy)<16*m){const back=p.slot>q.slot?p:q;back.hit=back===p?q:p}}
+    for(const b of f.birds){if(!b.hit){b.ov=Math.max(0,b.ov-dt*2);continue}
+      if((b.ov+=dt)>.8){const o=b.hit,dir=b.sy===o.sy?(Math.random()<.5?-1:1):Math.sign(b.sy-o.sy);b.sepTg+=dir*30*dt/(b.sc||1)*2;b.ov=.8}}
+    if(u>1&&!visible||u>1.8)f.wait=rnd(...f.rewait);
+  }
+  const flocks=[
+    makeFlock({count:[6,10],kinds:['approach','approach','recede','cross'],lowChance:.4,firstWait:[0,0],rewait:[4,9]}),
+    makeFlock({count:[5,9],kinds:['approach','recede','cross','far'],lowChance:.25,firstWait:[5,9],rewait:[8,16]}),
+    // a distant flock that stays far out, for depth
+    makeFlock({count:[6,12],kinds:['far','far','skein'],lowChance:0,firstWait:[2,4],rewait:[10,20]})
+  ];
+  size();launch(flocks[0]);flocks[0].u=.3;addEventListener('resize',size);
+  const drawList=[];
+
+  // ---- the sea below the horizon (86%). Seen from a distance at golden hour the water is mostly calm and dark,
+  // with long faint swells that crowd together toward the horizon, and a path of sun glitter under the low sun:
+  // a soft column of light, widening toward the viewer, full of tiny sparks that flash briefly and vanish
+  const HZ=.86,gauss=()=>(Math.random()+Math.random()+Math.random()-1.5)/1.5;
+  const swells=[...Array(26)].map((_,k)=>{const d=Math.pow((k+.5)/26,1.6);
+    return{d,segs:[...Array(5)].map(()=>({u:Math.random(),len:rnd(.06,.2),o:rnd(-1.5,1.5)})),sp:rnd(1.5,4)*(Math.random()<.5?-1:1)}});
+  const sparks=[...Array(420)].map(()=>({t:rnd(0,1),dur:0}));
+  let seaT=0;
+  function pathW(d){return W*(.035+.11*d)}                  // half-width of the glitter path at depth d (0 horizon, 1 bottom)
+  // most sparks land anywhere on the water, a few gather under the sun
+  function respark(g){g.d=Math.pow(Math.random(),1.5);g.path=Math.random()<.3;g.x=g.path?gauss()*1.3:Math.random();g.t=0;g.dur=rnd(.2,.6);g.wait=rnd(0,1.5);g.b=g.path?rnd(.3,.6):rnd(.15,.4)}
+  function drawSea(dt){
+    seaT+=dt;const hz=H*HZ,sh=H-hz,sunX=W*.6;
+    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalAlpha=1;
+    // haze where sky meets water
+    const haze=ctx.createLinearGradient(0,hz-H*.03,0,hz+H*.01);
+    haze.addColorStop(0,'rgba(235,160,120,0)');haze.addColorStop(.75,'rgba(225,168,145,.3)');haze.addColorStop(1,'rgba(150,135,140,0)');
+    ctx.fillStyle=haze;ctx.fillRect(0,hz-H*.03,W,H*.04);
+    ctx.save();ctx.beginPath();ctx.rect(0,hz,W,sh);ctx.clip();
+    // long faint swells: lighter crests, barely there, drifting slowly
+    for(const r of swells){const y=hz+sh*r.d,th=.5+1.3*r.d;
+      for(const g of r.segs){const len=W*g.len,x=((g.u*W+seaT*r.sp)%(W+len)+W+len)%(W+len)-len;
+        const gr=ctx.createLinearGradient(x,0,x+len,0);
+        gr.addColorStop(0,'rgba(220,200,200,0)');gr.addColorStop(.5,`rgba(225,200,195,${(.025+.04*r.d).toFixed(3)})`);gr.addColorStop(1,'rgba(220,200,200,0)');
+        ctx.fillStyle=gr;ctx.fillRect(x,y+g.o*th*2,len,th)}}
+    // the column of reflected light, drawn as thin horizontal slices so it breaks up like real water
+    for(let y=hz;y<H;y+=2){const d=(y-hz)/sh,w=pathW(d)*(.85+.3*Math.sin(y*.9+seaT*.7)*Math.sin(y*.23-seaT*.4));
+      const gr=ctx.createLinearGradient(sunX-w*1.6,0,sunX+w*1.6,0),a=(.12+.05*Math.sin(y*1.7+seaT*1.3))*(1-.4*d);
+      gr.addColorStop(0,'rgba(255,180,130,0)');gr.addColorStop(.5,`rgba(255,180,130,${a.toFixed(3)})`);gr.addColorStop(1,'rgba(255,180,130,0)');
+      ctx.fillStyle=gr;ctx.fillRect(sunX-w*1.6,y,w*3.2,1.2)}
+    // glitter: tiny sparks that flash on and off quickly, each one somewhere new
+    for(const g of sparks){
+      if(g.dur===0||g.t>g.dur+g.wait)respark(g);
+      g.t+=dt;if(g.t>g.dur)continue;
+      const k=Math.sin(Math.PI*g.t/g.dur),a=k*k*g.b*(1-.35*g.d);
+      const y=hz+sh*g.d,x=g.path?sunX+g.x*pathW(g.d):g.x*W,w=(1+3*g.d)*(.6+.8*k),h=.7+.9*g.d;
+      ctx.fillStyle=`rgba(255,${Math.round(232-25*g.d)},${Math.round(196-40*g.d)},${a.toFixed(3)})`;
+      ctx.fillRect(x-w/2,y,w,h)}
+    ctx.restore();
+  }
+  let last=0,raf=0,on=true;
+  function frame(now){
+    const dt=Math.min(1/30,last?(now-last)/1000:1/60);last=now;
+    ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);drawSea(dt);
+    // every bird from every flock, drawn far to near
+    drawList.length=0;for(const f of flocks)stepFlock(f,dt,drawList);
+    drawList.sort((p,q)=>q.Z-p.Z);for(const d of drawList)drawBird(d);
+    raf=on?requestAnimationFrame(frame):0;
+  }
+  const resume=()=>{if(on&&!raf&&!document.hidden){last=0;raf=requestAnimationFrame(frame)}};
+  new IntersectionObserver(([e])=>{on=e.isIntersecting;resume()}).observe(intro);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0}else resume()});
+})();
+
+// ---------- chapters, routed by #/id so each project has a shareable link ----------
+const chapter=$('#chapter');let lastFocus,gallery=[],curP=null;
+// saved gallery orders (by src) per project, kept in the page's db; only the owner sees the Arrange button and can write
+const ORDER={},EDIT={ok:false,on:false,db:null,pick:null,t:0};
+function ordered(id){const s=ORDER[id],a=(IMAGES[id]||[]).filter(x=>!x[4]);if(!s)return a;const m=new Map(a.map(x=>[x[0],x]));
+  return s.filter(x=>m.has(x)).map(x=>m.get(x)).concat(a.filter(x=>!s.includes(x[0])))}
+const galHTML=p=>gallery.map(([s,w,h],k)=>`<button type="button"${(p.wide||[]).includes(s)?' class="wide"':''} data-k="${k}" aria-label="Open image ${k+1} of ${gallery.length}"><img src="${s}" alt="" width="${w}" height="${h}" loading="lazy" draggable="false"></button>`).join('');
+// a case study: numbered sections of text, findings, quotes and before/after pairs, with figures that open in the lightbox
+function studyHTML(p){let k=0;const pair=(c,rows)=>`<ul class="${c}">${rows.map(([a,b])=>`<li><b>${esc(a)}</b><span>${esc(b)}</span></li>`).join('')}</ul>`;
+  return `<div class="study">${p.hero?`<section class="hero"><button type="button" data-k="${k++}" aria-label="Enlarge figure"><img src="${IMAGES[p.id][p.hero-1][0]}" alt="" width="${IMAGES[p.id][p.hero-1][1]}" height="${IMAGES[p.id][p.hero-1][2]}"></button></section>`:''}${p.study.map((x,j)=>`<section class="b${(j+1)%4}"><h2>${esc(x.h)}</h2><div class="body">
+    ${(x.p||[]).map(t=>`<p>${esc(t)}</p>`).join('')}${x.list?pair('steps',x.list):''}${x.ins?pair('ins',x.ins):''}
+    ${x.quotes?x.quotes.map(([q,c])=>`<blockquote>“${esc(q)}”<cite>${esc(c)}</cite></blockquote>`).join(''):''}
+    ${x.table?pair('steps',x.table):''}${x.map?pair('map',x.map):''}</div>
+    ${x.figs?`<figure class="figs${x.figs.length===1?' one':''}">${x.figs.map(n=>{const [s,w,h]=IMAGES[p.id][n-1];return `<button type="button" data-k="${k++}" aria-label="Enlarge figure"><img src="${s}" alt="" width="${w}" height="${h}" loading="lazy"></button>`}).join('')}${x.cap?`<figcaption>${esc(x.cap)}</figcaption>`:''}</figure>`:''}</section>`).join('')}</div>`}
+function swap(a,b){if(a===b)return;[gallery[a],gallery[b]]=[gallery[b],gallery[a]];const g=chapter.querySelector('.gallery');g.innerHTML=galHTML(curP);layGallery();
+  ORDER[curP.id]=gallery.map(x=>x[0]);const id=curP.id,e=$('#cEdit');e.textContent='Saving…';clearTimeout(EDIT.t);
+  EDIT.t=setTimeout(()=>EDIT.db.doc('order/'+id).set({srcs:ORDER[id]}).then(()=>{if($('#cEdit'))$('#cEdit').textContent='Saved · Done'},()=>{if($('#cEdit'))$('#cEdit').textContent='Not saved · Done'}),700)}
+function arrange(g){let d=null;const tile=e=>{const b=e.target.closest&&e.target.closest('.gallery button');return b&&g.contains(b)?b:null},clear=()=>g.querySelectorAll('.over').forEach(x=>x.classList.remove('over'));
+  g.addEventListener('pointerdown',e=>{if(!EDIT.on||e.button>0)return;const b=tile(e);if(!b)return;e.preventDefault();d={b,x:e.clientX,y:e.clientY,moved:false,over:null};b.setPointerCapture(e.pointerId)});
+  g.addEventListener('pointermove',e=>{if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(!d.moved&&Math.hypot(dx,dy)<6)return;d.moved=true;
+    d.b.classList.add('lift');d.b.style.transform=`translate(${dx}px,${dy}px)`;const u=document.elementFromPoint(e.clientX,e.clientY),o=u&&u.closest('.gallery button');clear();d.over=o&&o!==d.b&&g.contains(o)?o:null;if(d.over)d.over.classList.add('over');
+    const r=chapter.getBoundingClientRect();if(e.clientY<r.top+70)chapter.scrollTop-=12;else if(e.clientY>r.bottom-70)chapter.scrollTop+=12});
+  const end=e=>{if(!d)return;const {b,moved,over}=d;d=null;clear();b.classList.remove('lift');b.style.transform='';
+    if(moved){if(over&&e.type==='pointerup')swap(+b.dataset.k,+over.dataset.k)}
+    else{const p=g.querySelector('.pick');if(p&&p!==b){p.classList.remove('pick');swap(+p.dataset.k,+b.dataset.k)}else b.classList.toggle('pick')}};
+  g.addEventListener('pointerup',end);g.addEventListener('pointercancel',end)}
+// rows of pieces in gallery order. A piece named in p.wide gets a feature row: shown large, with two or four
+// pieces stacked in a column or two beside it; the others sit in justified rows of a common height
+function layGallery(){const g=chapter.querySelector('.gallery');if(!g||chapter.hidden)return;
+  const W=g.clientWidth,gap=14,S=+g.dataset.scale||1,T=Math.max(180*S,Math.min(300*S,W*S/4.6)),q=[...g.querySelectorAll('button')].map(b=>{const im=b.querySelector('img');return {b,r:im.getAttribute('width')/im.getAttribute('height'),big:b.classList.contains('wide')}});
+  let y=0,side=0,last=null;const put=(t,x,yy,w)=>{Object.assign(t.b.style,{left:x+'px',top:yy+'px',width:w+'px'})};
+  if(W<600){q.forEach(t=>{put(t,0,y,W);y+=W/t.r+gap})}
+  else while(q.length){
+    if(q[0].big){const B=q.shift(),rest=q.filter(t=>!t.big);let best=null;
+      for(const k of [0,1,2]){if(rest.length<2*k)break;const st=[];for(let s=0;s<k;s++)st.push([rest[2*s],rest[2*s+1]]);
+        const inv=st.map(([a,b])=>1/(1/a.r+1/b.r)),H=(W-k*gap+gap*inv.reduce((s,v)=>s+v,0))/(B.r+inv.reduce((s,v)=>s+v,0));
+        const score=Math.abs(Math.log(H/(T*1.9)))+(k===0&&B.r<2.2?3:0);if(H>0&&(!best||score<best.score))best={k,st,H,score}}
+      // nothing left to stack beside it: share the row with the next large piece, or stand alone at a capped height, centred
+      // nothing left to stack beside it: hang it as an ordinary piece so its row still fills the width
+      if(best.k===0&&B.r<2.2){B.big=false;q.unshift(B);continue}
+      last=null;const {st,H}=best,used=st.flat(),bw=B.r*H;used.forEach(t=>q.splice(q.indexOf(t),1));
+      const cols=[[B]].concat(st);if(side++%2)cols.reverse();let x=0;
+      cols.forEach(c=>{if(c.length===1){put(c[0],x,y,bw);x+=bw+gap}else{const cw=(H-gap)/(1/c[0].r+1/c[1].r);put(c[0],x,y,cw);put(c[1],x,y+cw/c[0].r+gap,cw);x+=cw+gap}});
+      y+=H+gap}
+    else{// every row spans the full width: borrow ordinary pieces from past the next large one, and fold a short last row into the one above
+      let row=[],sum=0;for(let i=0;i<q.length&&sum*T+gap*Math.max(0,row.length-1)<W;){if(q[i].big){i++;continue}const t=q.splice(i,1)[0];row.push(t);sum+=t.r}
+      // stop one piece short when that keeps the row height closer to the target, so sizes stay even
+      if(row.length>2){const l=row[row.length-1],Hw=(W-gap*(row.length-1))/sum,Ho=(W-gap*(row.length-2))/(sum-l.r);if(Math.abs(Math.log(Ho/T))<Math.abs(Math.log(Hw/T))){row.pop();sum-=l.r;q.unshift(l)}}
+      if(sum*T+gap*(row.length-1)<W*.8&&last){row=last.row.concat(row);sum+=last.sum;y=last.y}
+      const H=(W-gap*(row.length-1))/sum;let x=0;
+      row.forEach(t=>{put(t,x,y,t.r*H);x+=t.r*H+gap});last={row,sum,y};y+=H+gap}}
+  g.style.height=Math.max(0,y-gap)+'px';g.classList.add('laid')}
+addEventListener('resize',layGallery);
+function go(id){location.hash='/'+id}
+// cards for locked projects say so on hover
+document.querySelectorAll('a.face[href^="#/"]').forEach(a=>{const id=a.getAttribute('href').slice(2);if(LOCKED.has(id)){const g=a.querySelector('.go');if(g)g.textContent='Coming soon'}});
+function render(p){
+  if(isLocked(p)){curP=null;chapter.classList.remove('arranging');
+    chapter.style.setProperty('--bg',p.bg);chapter.style.setProperty('--fg',p.fg);
+    chapter.innerHTML=`<div class="top"><span class="kind">${esc(p.kind)}</span><span class="acts"><button type="button" id="cClose">Back to work</button></span></div>
+    <article class="chap soon-page"><p class="for">${p.for}</p><h1 id="cTitle">${p.title}</h1><p class="soon-tag">Coming soon</p></article>`;
+    $('#cClose').onclick=()=>{history.pushState('',document.title,location.pathname+location.search);route()};return}
+  const OPEN=PROJECTS.filter(x=>!isLocked(x)&&!x.hidden),i=OPEN.findIndex(x=>x.id===p.id),prev=OPEN[(i+OPEN.length-1)%OPEN.length],next=OPEN[(i+1)%OPEN.length];
+  gallery=p.study?(p.hero?[p.hero]:[]).concat(p.study.flatMap(x=>x.figs||[])).map(n=>IMAGES[p.id][n-1]):ordered(p.id);curP=p;EDIT.on=false;chapter.classList.remove('arranging');
+  const tile=p.cbg||'rgba(255,255,255,.14)';
+  chapter.style.setProperty('--bg',p.bg);chapter.style.setProperty('--fg',p.fg);chapter.style.setProperty('--tile',tile);
+  chapter.innerHTML=`<div class="top"><span class="kind">${String(i+1).padStart(2,'0')} / ${OPEN.length}</span><span class="acts">${EDIT.ok&&!p.study?'<button type="button" id="cEdit" aria-pressed="false">Arrange</button>':''}<button type="button" id="cClose">Back to work</button></span></div>
+  <article class="chap">
+    <p class="for">${p.for}</p><h1 id="cTitle">${p.title}</h1>
+    <div class="lead"><div class="lcol"><p class="intro-text">${esc(p.intro)}</p>${!p.study&&p.more?`<div class="more">${p.more.map(t=>`<p>${esc(t)}</p>`).join('')}</div>`:''}
+      ${p.skills.length?`<div class="skills"><h3>Skills</h3><div class="chips">${p.skills.map(s=>`<span>${esc(s)}</span>`).join('')}</div></div>`:''}</div><div class="meta">
+      ${p.challenge?`<div><h3>The challenge</h3><p>${esc(p.challenge)}</p></div>`:''}
+      ${p.role?`<div><h3>My role</h3><p>${esc(p.role)}</p></div>`:''}
+    </div></div>
+    ${p.study?studyHTML(p):`<div class="gallery" data-scale="${p.gscale||1}">${galHTML(p)}</div>`}
+    <nav class="pager"><a href="#/${prev.id}"><span>Previous</span>${prev.title}</a><a href="#/${next.id}"><span>Next</span>${next.title}</a></nav>
+  </article>`;
+  $('#cClose').onclick=()=>{history.pushState('',document.title,location.pathname+location.search);route()};
+  requestAnimationFrame(layGallery);
+  if(p.study){chapter.querySelector('.study').onclick=e=>{const b=e.target.closest('button[data-k]');if(b)openLb(+b.dataset.k)};return}
+  const g=chapter.querySelector('.gallery');g.onclick=e=>{const b=e.target.closest('button');if(b&&!EDIT.on)openLb(+b.dataset.k)};
+  if(EDIT.ok){arrange(g);$('#cEdit').onclick=e=>{EDIT.on=!EDIT.on;chapter.classList.toggle('arranging',EDIT.on);g.querySelectorAll('.pick').forEach(x=>x.classList.remove('pick'));
+    e.target.classList.toggle('on',EDIT.on);e.target.setAttribute('aria-pressed',EDIT.on);e.target.textContent=EDIT.on?'Done':'Arrange'}}
+}
+function route(){
+  const m=location.hash.match(/^#\/([\w-]+)/),p=m&&(PROJECTS.find(x=>x.id===m[1])||fromPreview(m[1]));
+  if(p){
+    if(chapter.hidden){lastFocus=document.activeElement;document.body.style.overflow='hidden'}
+    render(p);chapter.hidden=false;chapter.scrollTop=0;$('#cClose').focus();document.title=p.title+' · Ava Mendelsohn';
+  }else if(!chapter.hidden){
+    chapter.hidden=true;document.body.style.overflow='';document.title='Ava Mendelsohn';lastFocus&&lastFocus.focus&&lastFocus.focus();
+  }
+}
+addEventListener('hashchange',route);route();
+// load saved orders, then light up Arrange for the owner (pages viewed without the runtime keep the built-in order)
+(async()=>{if(!window.claude||!claude.use)return;const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
+  let changed=false;if(db){EDIT.db=db;try{(await db.collection('order').get()).docs.forEach(d=>{const v=d.data();if(v&&Array.isArray(v.srcs)){ORDER[d.id]=v.srcs;changed=true}})}catch(e){}}
+  if(db&&user)try{EDIT.ok=await user.isOwner()}catch(e){}
+  if((changed||EDIT.ok)&&!chapter.hidden&&curP){const t=chapter.scrollTop;render(curP);chapter.scrollTop=t}})();
+
+// ---------- lightbox ----------
+const lb=$('#lb'),lbImg=lb.querySelector('img');let cur=0;
+function show(k){cur=(k+gallery.length)%gallery.length;lbImg.src=gallery[cur][0];lb.querySelector('.count').textContent=`${cur+1} / ${gallery.length}`+(gallery[cur][3]?` · ${gallery[cur][3]}`:'')}
+function openLb(k){show(k);lb.hidden=false;lb.querySelector('.x').focus()}
+function closeLb(){lb.hidden=true;const b=chapter.querySelector(`[data-k="${cur}"]`);b&&b.focus()}
+lb.querySelector('.prev').onclick=()=>show(cur-1);lb.querySelector('.next').onclick=()=>show(cur+1);lb.querySelector('.x').onclick=closeLb;
+lb.addEventListener('click',e=>{if(e.target===lb)closeLb()});
+addEventListener('keydown',e=>{
+  if(!lb.hidden){if(e.key==='Escape')closeLb();if(e.key==='ArrowLeft')show(cur-1);if(e.key==='ArrowRight')show(cur+1);return}
+  if(!chapter.hidden&&e.key==='Escape')$('#cClose').click();
+});
+
+// outdoor places map: x,y are geoAlbersUsa().scale(1300).translate([487.5,305]) of [lon,lat]; img is optional
+const PLACES=[
+ {name:'Desolation Wilderness',lat:38.88,lon:-120.17,x:79.8,y:247.4,side:'r'},
+ {name:'Glacier National Park',lat:48.7,lon:-113.8,x:230,y:52.4,side:'r'},
+ {name:'Marin Headlands',lat:37.83,lon:-122.52,x:33.5,y:259.7,side:'b'},
+];
+(()=>{const g=document.getElementById('opins'),tip=document.getElementById('otip'),box=document.getElementById('omap');if(!g)return;
+ const NS='http://www.w3.org/2000/svg';
+ PLACES.forEach(p=>{const a=document.createElementNS(NS,'g');a.setAttribute('class','pin');a.setAttribute('tabindex','0');a.setAttribute('transform',`translate(${p.x},${p.y})`);
+  const tx=p.side==='b'?{x:-6,y:30,a:'start'}:p.side==='l'?{x:-12,y:4,a:'end'}:{x:16,y:6,a:'start'};
+  a.innerHTML=`<circle class="r" r="14"/><circle class="d" r="8"/><text x="${tx.x}" y="${tx.y}" text-anchor="${tx.a}">${p.name}</text>`;
+  const show=()=>{if(!p.img){tip.classList.remove('on');return}const r=box.getBoundingClientRect(),c=a.getBoundingClientRect();
+   tip.innerHTML=`<img src="${p.img}" alt="">${p.name}`;tip.style.left=(c.left+c.width/2-r.left)+'px';tip.style.top=(c.top-r.top)+'px';tip.classList.add('on')};
+  a.addEventListener('mouseenter',show);a.addEventListener('focus',show);a.addEventListener('click',show);
+  a.addEventListener('mouseleave',()=>tip.classList.remove('on'));a.addEventListener('blur',()=>tip.classList.remove('on'));
+  g.appendChild(a)})})();
+</script>
+</body>
+</html>
