@@ -790,8 +790,24 @@ function gaitPose(rig,p,r,amp){
     const n=BODY.length/2,P=i=>proj(BODY[(i%n)*2],BODY[(i%n)*2+1],0);
     ctx.beginPath();let [x0,y0]=P(0),[x1,y1]=P(1);ctx.moveTo((x0+x1)/2,(y0+y1)/2);
     for(let i=1;i<=n;i++){const [ax,ay]=P(i),[bx,by]=P(i+1);ctx.quadraticCurveTo(ax,ay,(ax+bx)/2,(ay+by)/2)}
+    // the torso as a volume: a run of oval cross-sections along the body, each as tall as the traced side outline
+    // and about 0.8 as wide as it is tall (narrower toward the chest and tail). They go through the same roll as
+    // everything else, so a banked bird shows a little of its back or belly; at no bank they sit inside the traced
+    // outline, so the level silhouette is unchanged
+    ctx.fill();if(!TORSO)TORSO=torso();ctx.beginPath();
+    for(const st of TORSO){let first=true;
+      for(let i=0;i<14;i++){const t=TAU*i/14,[X,Y]=proj(st.x,st.c+st.a*Math.cos(t),st.b*Math.sin(t));first?(ctx.moveTo(X,Y),first=false):ctx.lineTo(X,Y)}
+      ctx.closePath()}
     ctx.fill();
   }
+  let TORSO=null;
+  function torso(){const n=BODY.length/2,out=[];
+    for(let x=-22;x<=54;x+=3){let lo=1e9,hi=-1e9;
+      for(let i=0;i<n;i++){const x1=BODY[i*2],y1=BODY[i*2+1],x2=BODY[((i+1)%n)*2],y2=BODY[((i+1)%n)*2+1];
+        if((x1-x)*(x2-x)<=0&&x1!==x2){const y=y1+(y2-y1)*(x-x1)/(x2-x1);lo=Math.min(lo,y);hi=Math.max(hi,y)}}
+      const hh=(hi-lo)/2*.92,b=.8*hh*Math.sqrt(Math.sin(Math.PI*(x+24)/80));
+      out.push({x,c:(lo+hi)/2,b,a:Math.sqrt(Math.max(1,hh*hh-b*b*TILT*TILT))})}
+    return out}
   // The wing is a real brown-pelican planform (seen from above: long broad arm, forward-bent wrist, slotted
   // fingertip primaries), measured as [span, chord] from the shoulder. It is lifted in 3D (arm by e1, hand by a
   // further e2, hand swept back by sw) and projected for a camera a little below and behind the bird, so its
@@ -807,14 +823,18 @@ function gaitPose(rig,p,r,amp){
   // Body and wings go through the same roll, so the bird banks as one connected piece.
   let HK=1,HYAW=0,RC=1,RS=0;   // heading: foreshortening and turn toward (-) or away (+); roll: cos and sin of the bank
   const proj=(x,y,z)=>{const yr=y*RC-z*RS,zr=y*RS+z*RC;return [x*HK+zr*(YAW-HYAW),yr+zr*TILT]};
-  function wing(e1,e2,sw,side,ox,oy,len){
+  // the two shoulders are mirror images across the body's midline: same place along the body, same height, out to
+  // either side at the torso's half-width (SHZ). Both wings use the same angles and size, so the far wing is simply
+  // the near wing reflected through the body and projected; nothing is offset by hand
+  const SHX=12,SHY=-7.5,SHZ=10,WLEN=1.24;
+  function wing(e1,e2,sw,side,len){
     const c1=Math.cos(e1*D),s1=Math.sin(e1*D),c2=Math.cos((e1+e2)*D),s2=Math.sin((e1+e2)*D),cs=Math.cos(sw*D),ss=Math.sin(sw*D);
     ctx.beginPath();
     PLAN.forEach(([sp,ch],i)=>{
       sp*=len;ch*=len;let x,y,z;const w=WRIST*len;
       if(sp<=w){x=ch;y=-sp*s1;z=sp*c1}
       else{const h=sp-w,hx=ch+h*ss,hs=h*cs;x=hx;y=-w*s1-hs*s2;z=w*c1+hs*c2}
-      z*=side;const [X,Y]=proj(ox+x,oy+y,z);
+      z=(z+SHZ)*side;const [X,Y]=proj(SHX+x,SHY+y,z);
       i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);
     });
     ctx.closePath();ctx.fill();
@@ -828,7 +848,7 @@ function gaitPose(rig,p,r,amp){
     // the bank is a roll of the whole bird about its long axis (see proj); positive lifts the near wing
     HK=d.hk;HYAW=d.hz;RC=Math.cos(d.bank*D);RS=Math.sin(d.bank*D);
     const p=d.p,q=d.asym,fa=q&&q.side<0?q:{e1:0,e2:0},na=q&&q.side>0?q:{e1:0,e2:0};
-    wing(p.e1-4+fa.e1,p.e2+fa.e2,p.sw,-1,16,-9,1.2);body();wing(p.e1+na.e1,p.e2+na.e2,p.sw,1,8,-6,1.28);
+    wing(p.e1+fa.e1,p.e2+fa.e2,p.sw,-1,WLEN);body();wing(p.e1+na.e1,p.e2+na.e2,p.sw,1,WLEN);
   }
 
   // ---- the birds fly in a 3D airspace, seen as if from a cliff above the water. Every bird has a world position
