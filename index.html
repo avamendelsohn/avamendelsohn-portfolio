@@ -88,6 +88,8 @@ button{font:inherit;color:inherit}
 .hud .home{font-size:19px;letter-spacing:-.01em}
 .hud .home,.hud .ab{text-decoration:none;opacity:0;transition:opacity .3s;pointer-events:none}
 .hud.out .home,.hud.out .ab{opacity:1;pointer-events:auto}
+/* the HUD is drawn in difference mode, so this amber reads as the name's blue (#1f5fd1) on the light pages and as a warm gold on the dark one */
+.hud .home{transition:opacity .3s,color .2s}.hud .home:hover{color:#cd8d19}
 .hud .ab{justify-self:end}
 .hud .mid{display:grid;justify-items:center;gap:8px}
 .where{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
@@ -916,7 +918,7 @@ function gaitPose(rig,p,r,amp){
   // bank in degrees per radian/second of turn, and its limit. The turns here are gentle (about 1.3 degrees a second
   // on a curved pass), so the bank is scaled up past strict physics to read at this size. It eases toward BANK_MAX:
   // about 9 degrees on a gentle curve, 12-17 on a typical one, close to 20 on the tightest, nothing on a straight one
-  const BANK_K=380,BANK_MAX=40,GL_DELAY=.35;
+  const BANK_K=380,BANK_MAX=40,GL_DELAY=.35,FAN=120;
   // development only: add ?debugbank to the page address (or set true) to pick the largest pelican, label its
   // heading and bank, and hold it with keys 1 (-20), 2 (0), 3 (+20) or let it bank on its own with 4
   const DEBUG_BANK=false||/[?&]debugbank\b/.test(location.search);
@@ -967,13 +969,13 @@ function gaitPose(rig,p,r,amp){
     return slots;
   }
   function setShape(f,shape){
-    f.shape=shape;f.slots=slotsFor(f.birds.length||f.n,shape,f.kind==='skein');
+    f.shape=shape;f.slots=slotsFor(f.birds.length||f.n,shape,f.kind==='skein'||f.kind==='horizon');
     f.flat=shape==='string'?0:rnd(.1,.25);
     f.gaps=f.slots.map(()=>drift(2,5,.6));   // each gap to the bird ahead stretches and closes on its own
   }
   function layout(f){
-    const skein=f.kind==='skein';
-    f.n=skein?Math.round(rnd(16,26)):Math.round(rnd(...f.count));f.birds=[];
+    const skein=f.kind==='skein'||f.kind==='horizon';
+    f.n=f.kind==='horizon'?Math.round(rnd(24,38)):skein?Math.round(rnd(16,26)):Math.round(rnd(...f.count));f.birds=[];
     setShape(f,f.low||skein?'string':SHAPES[Math.floor(Math.random()*SHAPES.length)]);
     f.birds=f.slots.map((sl,i)=>({slot:i,size:rnd(.94,1.06),w:wings(i===0),alt:0,valt:0,fwd:0,pitch:0,
       off:{b:sl.back,l:sl.lat,d:sl.drop},db:drift(1.5,3.5,.8),dl:drift(1.8,4,.7),dd:drift(1.8,4,.7),ge1:drift(5,12,.25),ge2:drift(5,12,.25),ge3:drift(6,14,.2),rl:drift(3,7,.35),lean:{v:0,t:0,dur:0,wait:rnd(3,14)},
@@ -1010,12 +1012,14 @@ function gaitPose(rig,p,r,amp){
     return {side:a.side,e1:k*a.de1,e2:k*a.de2}}
   function makeFlock(o){return {...o,birds:[],slots:[],t:0,wait:rnd(...o.firstWait)}}
   function launch(f,tries=0){
-    const kind=f.kinds[Math.floor(Math.random()*f.kinds.length)],left=Math.random()<.65,low=kind!=='far'&&kind!=='skein'&&Math.random()<f.lowChance;
+    const kind=f.kinds[Math.floor(Math.random()*f.kinds.length)],left=Math.random()<.65,low=kind!=='far'&&kind!=='skein'&&kind!=='horizon'&&Math.random()<f.lowChance;
     const off=left?-1:1,edgeIn=left?W+80:-80,edgeOut=left?-80:W+80,inside=()=>W*(left?rnd(.7,1):rnd(0,.3));
     let a,b;   // [screen x, screen y, Z] at the start and end of the pass
     const nearY=()=>H*(low?rnd(.66,.72):rnd(.38,.6)),farY=()=>H*rnd(.16,.3);
     if(kind==='approach'){a=[inside(),farY(),rnd(9000,ZFAR)];b=[edgeOut,nearY(),rnd(ZNEAR,3200)]}
     else if(kind==='recede'){a=[edgeIn,nearY(),rnd(ZNEAR,3200)];b=[inside(),farY(),rnd(9000,ZFAR)]}
+    // a very long string far out, flying just above the horizon (86%)
+    else if(kind==='horizon'){const Z=rnd(12500,14500),y=H*rnd(.785,.825);a=[edgeIn,y,Z];b=[edgeOut,y+H*rnd(-.008,.008),Z*rnd(.94,1.06)]}
     else{const Z=kind==='skein'?rnd(10000,13500):kind==='far'?rnd(8000,13000):rnd(3500,9000),y=H*(low?rnd(.68,.74):rnd(.2,.5));
       // far birds drift a little nearer or farther as they cross; nearer crossings drift clearly toward or away from the viewer on the way
       // across, so they visibly grow or shrink (the closer they start, the bigger the change)
@@ -1029,11 +1033,12 @@ function gaitPose(rig,p,r,amp){
     // a path pointed too straight at (or away from) the viewer stacks the formation into a column: pick again
     if(Math.abs(dx)<Math.abs(dz)*1.1&&tries<12)return launch(f,tries+1);
     // most paths curve: the middle of the path bows sideways (a gentle turn) and a little up or down
-    const bend=Math.random()<.75?rnd(-.3,.3):0,M=[0,1,2].map(i=>(f.P0[i]+f.P1[i])/2);
-    f.C=[M[0]-dz/hl*bend*hl,M[1]+rnd(-.12,.12)*hl*.3,M[2]+dx/hl*bend*hl];
+    const hz=kind==='horizon',bend=hz?rnd(-.06,.06):Math.random()<.75?rnd(-.3,.3):0,M=[0,1,2].map(i=>(f.P0[i]+f.P1[i])/2);   // the horizon strings stay nearly straight and level
+    f.C=[M[0]-dz/hl*bend*hl,M[1]+(hz?0:rnd(-.12,.12)*hl*.3),M[2]+dx/hl*bend*hl];
     f.D=(Math.hypot(dx,f.P1[1]-f.P0[1],dz)+Math.hypot(...f.C.map((c,i)=>c-f.P0[i]))+Math.hypot(...f.C.map((c,i)=>f.P1[i]-c)))/2;
     f.v=V*rnd(.9,1.1);f.flip=!left;
-    f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(18,32);layout(f);f.gl={t:0,dur:0,v:0,wait:rnd(6,16)};
+    f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(18,32);layout(f);f.fan=0;f.fanTg=0;f.vt=0;if(kind==='horizon')for(const sl of f.slots)sl.drop*=.15;   // keep the horizon strings nearly level
+    f.gl={t:0,dur:0,v:0,wait:rnd(6,16)};
   }
   // a point on the curved path (a quadratic curve through C), and the path's level direction there; past either
   // end it carries straight on
@@ -1058,7 +1063,7 @@ function gaitPose(rig,p,r,amp){
       const lead=f.birds.find(b=>b.slot===0),cand=f.birds.filter(b=>f.slots[b.slot].rank===1);
       if(lead&&cand.length){const c=cand[Math.floor(Math.random()*cand.length)];[lead.slot,c.slot]=[c.slot,0];c.w.glide=Math.max(c.w.glide,2)}}
     // reshaping also waits for the leader to open a bout, so the whole flock moves into the new shape under power
-    if((f.reshape-=dt)<=0&&!f.low&&f.kind!=='skein'&&f.birds.find(b=>b.slot===0)?.w.started){f.reshape=rnd(18,35);reshape(f)}
+    if((f.reshape-=dt)<=0&&!f.low&&f.kind!=='skein'&&f.kind!=='horizon'&&f.birds.find(b=>b.slot===0)?.w.started){f.reshape=rnd(18,35);reshape(f)}
     const bySlot=[];for(const b of f.birds)bySlot[b.slot]=b;
     // where each slot sits right now: every gap along an arm is its own length times a factor wandering
     // between about 0.55 and 1.45, so neighbours are always closing up or falling back
@@ -1094,8 +1099,11 @@ function gaitPose(rig,p,r,amp){
       // birds that have sat on top of each other for more than a moment ease apart (see the end of stepFlock)
       if(b.sep===undefined){b.sep=0;b.sepTg=0;b.ov=0}
       b.sepTg*=Math.exp(-dt/(b.hit?60:14));b.sep+=(b.sepTg-b.sep)*(1-Math.exp(-dt*1.6));
-      const X=P[0]-tz*b.off.l,Z=Math.max(400,P[2]+tx*b.off.l),Yd=P[1]+air+b.off.d+b.alt+b.sep;
-      const sc=F/Z,x=CX+X*sc,y=CY+Yd*sc,s=sc*b.size;
+      const X0=P[0]-tz*b.off.l,Z=Math.max(400,P[2]+tx*b.off.l),Yd=P[1]+air+b.off.d+b.alt+b.sep;
+      // fanning out of a column (see the end of stepFlock): each bird slides sideways by its place in the line, so the
+      // column leans over into a trailing string
+      const X=X0+(f.fan||0)*FAN*(f.slots[b.slot].rank||0)*(f.flip?-1:1);
+      const sc=F/Z,x=CX+X*sc,y=CY+Yd*sc,s=sc*b.size;b.ux=CX+X0*sc;
       // heading: the bird faces along the path (its level direction tx,tz), eased so it turns smoothly. Seen from the
       // side, a bird angled toward or away from us looks shorter and its wings swing out across the view; the rate the
       // heading turns sets a gentle bank, into the turn (the inside wing dips), levelling out again on the straight
@@ -1129,13 +1137,24 @@ function gaitPose(rig,p,r,amp){
     for(const b of f.birds){if(!b.hit){b.ov=Math.max(0,b.ov-dt*2);continue}
       if((b.ov+=dt)>.6){const o=b.hit;if(!b.sepDir||b.ov<.62)b.sepDir=Math.abs(b.sy-o.sy)<1?(Math.random()<.5?-1:1):Math.sign(b.sy-o.sy);
         b.sepTg+=b.sepDir*(60+60*Math.min(2,b.ov-.6))*dt/(b.sc||1);b.ov=Math.min(b.ov,3)}}
+    // a flock can pass through a tall column on screen (birds stacked one above another, as when it comes toward
+    // or goes away from the viewer) but shouldn't stay in one: if its birds have lined up close to vertical for
+    // about 2 s, they ease out sideways into a trailing string, and ease back once the column has gone
+    {const pts=f.birds.filter(b=>b.sx>-50&&b.sx<W+50);let vert=false;
+      if(pts.length>=3){let mx=0,my=0;for(const b of pts){mx+=b.ux;my+=b.sy}mx/=pts.length;my/=pts.length;
+        let xx=0,yy=0,xy=0;for(const b of pts){xx+=(b.ux-mx)**2;yy+=(b.sy-my)**2;xy+=(b.ux-mx)*(b.sy-my)}
+        vert=yy>xx&&Math.abs(.5*Math.atan2(2*xy,xx-yy))>50*D}
+      f.vt=Math.min(4,Math.max(0,(f.vt||0)+(vert?dt:-dt)));
+      if(f.vt>2)f.fanTg=1;else if(f.vt===0)f.fanTg=0;
+      f.fan=(f.fan||0)+((f.fanTg||0)-(f.fan||0))*(1-Math.exp(-dt*.5))}
     if(u>1&&!visible||u>1.8)f.wait=rnd(...f.rewait);
   }
   const flocks=[
     makeFlock({count:[6,10],kinds:['approach','approach','recede','cross'],lowChance:.55,firstWait:[0,0],rewait:[4,9]}),
     makeFlock({count:[5,9],kinds:['approach','recede','cross','far'],lowChance:.4,firstWait:[5,9],rewait:[8,16]}),
     // a distant flock that stays far out, for depth
-    makeFlock({count:[6,12],kinds:['far','far','skein'],lowChance:0,firstWait:[2,4],rewait:[10,20]})
+    makeFlock({count:[6,12],kinds:['far','far','skein'],lowChance:0,firstWait:[2,4],rewait:[10,20]}),
+    makeFlock({count:[24,38],kinds:['horizon'],lowChance:0,firstWait:[6,12],rewait:[18,40]})
   ];
   size();launch(flocks[0]);flocks[0].u=.3;addEventListener('resize',size);
   const drawList=[];
