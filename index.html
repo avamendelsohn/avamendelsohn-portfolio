@@ -453,7 +453,7 @@ const PROJECTS=[
  {id:"print",hidden:true,title:"Magazine & Newspaper",kind:"Editorial layout",for:"Layout for",bg:"var(--pink)",fg:"var(--ink)",x:28,y:1160,w:270,r:2,cover:0,ar:"2/1",
   blurb:"Layouts for a student art and literary magazine and the school paper.",
   intro:"Work from a student art and literary magazine and a school newspaper: layout done mainly in Adobe InDesign, some of my physical artwork, plus logos and digital graphics.",skills:["InDesign","Editorial layout","Logos","Digital content"]},
- {id:"photo",title:"Photography",gscale:1.4,kind:"Personal",for:"Looking around",bg:"var(--ink)",fg:"var(--paper)",x:55,y:1560,w:230,r:3.5,cover:0,ar:"4/5",
+ {id:"photo",title:"Photography",gscale:1.4,kind:"Personal",for:"",bg:"var(--ink)",fg:"var(--paper)",x:55,y:1560,w:230,r:3.5,cover:0,ar:"4/5",
   blurb:"Not a professional practice, just a lot of looking.",
   intro:"Not a professional practice: a collection of personal photography and design.",skills:[]},
 ].filter(p=>!p.hidden); // hidden projects stay in the source but leave the site
@@ -471,9 +471,9 @@ Object.assign(byId('wesharecare'),fromPreview('wesharecare-study'));
 const STUDIOS=[
  {id:'art',name:'Artwork',blurb:'BFA in studio art: painting, printmaking, drawing and woodworking.',
   pieces:{p:'art',k:[0,2,3,8,16,18,1,7,25]},hang:[[56,0],[42,-9],[50,7],[38,-6],[56,0],[42,-9],[50,7],[48,-4],[40,4]]},
- {id:'photo',name:'Photography',sub:'looking around',blurb:'Places I’ve been and things that caught my eye.',
+ {id:'photo',name:'Photography',blurb:'Places I’ve been and things that caught my eye.',
   pieces:{p:'photo',k:[8,19,10,47,3,13]},hang:[[46,-2],[54,4],[50,-7],[40,6]]},
- {id:'ux',name:'UX design',sub:'research to interface',blurb:'BS in Human Factors Engineering: systems design, in-depth research, interaction design and testing.',
+ {id:'ux',name:'UX design',blurb:'BS in Human Factors Engineering: systems design, in-depth research, interaction design and testing.',
   slides:['autodesk','wesharecare','zoox','hobbees']},
  {id:'personal',name:'Personal projects',sub:'design and fabrication',blurb:'Product design, understanding fabrication and how things work.',
   slides:['furniture','bike','knife']},
@@ -1063,7 +1063,7 @@ function render(p){
   if(isLocked(p)){curP=null;chapter.classList.remove('arranging');
     chapter.style.setProperty('--bg',p.bg);chapter.style.setProperty('--fg',p.fg);
     chapter.innerHTML=`<div class="top"><span class="kind">${esc(p.kind)}</span><span class="acts"><button type="button" id="cClose">Back to work</button></span></div>
-    <article class="chap soon-page"><p class="for">${p.for}</p><h1 id="cTitle">${p.title}</h1><p class="soon-tag">Coming soon</p></article>`;
+    <article class="chap soon-page">${p.for?`<p class="for">${p.for}</p>`:''}<h1 id="cTitle">${p.title}</h1><p class="soon-tag">Coming soon</p></article>`;
     $('#cClose').onclick=()=>{history.pushState('',document.title,location.pathname+location.search);route()};return}
   const OPEN=PROJECTS.filter(x=>!isLocked(x)&&!x.hidden),i=OPEN.findIndex(x=>x.id===p.id),prev=OPEN[(i+OPEN.length-1)%OPEN.length],next=OPEN[(i+1)%OPEN.length];
   gallery=p.study?(p.hero?[p.hero]:[]).concat(p.study.flatMap(x=>x.figs||[])).map(n=>IMAGES[p.id][n-1]):ordered(p.id);curP=p;EDIT.on=false;chapter.classList.remove('arranging');
@@ -1071,7 +1071,7 @@ function render(p){
   chapter.style.setProperty('--bg',p.bg);chapter.style.setProperty('--fg',p.fg);chapter.style.setProperty('--tile',tile);
   chapter.innerHTML=`<div class="top"><span class="kind">${String(i+1).padStart(2,'0')} / ${OPEN.length}</span><span class="acts">${EDIT.ok&&!p.study?'<button type="button" id="cEdit" aria-pressed="false">Arrange</button>':''}<button type="button" id="cClose">Back to work</button></span></div>
   <article class="chap">
-    <p class="for">${p.for}</p><h1 id="cTitle">${p.title}</h1>
+    ${p.for?`<p class="for">${p.for}</p>`:''}<h1 id="cTitle">${p.title}</h1>
     <div class="lead"><div class="lcol"><p class="intro-text">${esc(p.intro)}</p>${!p.study&&p.more?`<div class="more">${p.more.map(t=>`<p>${esc(t)}</p>`).join('')}</div>`:''}
       ${p.skills.length?`<div class="skills"><h3>Skills</h3><div class="chips">${p.skills.map(s=>`<span>${esc(s)}</span>`).join('')}</div></div>`:''}</div><div class="meta">
       ${p.challenge?`<div><h3>The challenge</h3><p>${esc(p.challenge)}</p></div>`:''}
