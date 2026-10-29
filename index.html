@@ -763,12 +763,22 @@ function gaitPose(rig,p,r,amp){
   cv.style.cssText='position:absolute;inset:0;width:100%;height:100%';
   const D=Math.PI/180,TAU=Math.PI*2,rnd=(a,b)=>a+Math.random()*(b-a),lerp=(a,b,k)=>a+(b-a)*k;
 
-  // ---- wing pose (beat depth and the bowed glide from Ava's videos). The flap is a plain sine: shoulder angle e1 swings around level, and the hand follows the arm a
-  // little late (a damped, lagging sine) so the wing curves through the stroke instead of hinging. Glide is fixed.
-  const GLIDE={e1:5,e2:-15,sw:6};                      // arms a touch up, hands drooping: the bowed pelican glide
-  // upstroke: the hand sweeps back and folds a little; downstroke: the wing spreads wide and the tip trails
-  const flapPose=ph=>({e1:8+48*Math.cos(TAU*ph),e2:-18*Math.sin(TAU*ph+.9)-6,sw:10+10*Math.sin(TAU*ph)});
-  const pose=(ph,g)=>{const f=flapPose(ph);return {e1:lerp(f.e1,GLIDE.e1,g),e2:lerp(f.e2,GLIDE.e2,g),sw:lerp(f.sw,GLIDE.sw,g)}};
+  // ---- wing pose. One wingbeat is a cycle of phase 0..1: 0 is the top of the stroke, the downstroke runs to DOWN
+  // and the recovery (upstroke) takes the rest. The downstroke is the power stroke: it starts gently off the top,
+  // drives hard through the middle and eases into the bottom (KD sets how much faster the middle is). The upstroke
+  // is a plain, quicker recovery. Reversals are smooth turns, never held. The hand follows the arm LAG of a cycle
+  // late, so the outer wing trails up through the downstroke and down through the recovery and the wing curves
+  // instead of hinging; on the recovery the wrist flexes a little and the hand sweeps back.
+  const GLIDE={e1:4,e2:-9,sw:7};                       // arms just above level, hands a little lower: the broad, slightly bowed glide
+  const DOWN=.55,KD=.35,SH_MID=8,SH_AMP=46,LAG=.07,TIP=22,FLEX=9;
+  const stroke=ph=>{const u=ph-Math.floor(ph);                       // shoulder position: +1 at the top, -1 at the bottom
+    if(u<DOWN){const k=u/DOWN;return Math.cos(Math.PI*(k-KD*Math.sin(TAU*k)/TAU))}
+    return Math.cos(Math.PI*(1+(u-DOWN)/(1-DOWN)))};
+  const flapPose=ph=>{const c=stroke(ph),u=ph-Math.floor(ph),up=u<DOWN?0:Math.sin(Math.PI*(u-DOWN)/(1-DOWN));
+    return {e1:SH_MID+SH_AMP*c,e2:-4+TIP*(stroke(ph-LAG)-c),sw:6+FLEX*up}};
+  // a=how much of the wingbeat is showing (0 gliding, 1 full stroke); gl=this bird's glide pose
+  const pose=(ph,a,gl)=>{const f=flapPose(ph);return {e1:lerp(gl.e1,f.e1,a),e2:lerp(gl.e2,f.e2,a),sw:lerp(gl.sw,f.sw,a)}};
+  const smooth=(a,b,x)=>{const k=Math.min(1,Math.max(0,(x-a)/(b-a)));return k*k*(3-2*k)};
 
   // ---- drawing, in bird units (about 135 long, facing left)
   const BODY=[-68.4,9.8,-68.0,10.6,-64.3,10.6,-62.6,8.9,-57.6,8.9,-56.3,7.3,-52.6,7.3,-51.3,5.6,-47.6,5.6,-46.3,3.9,-42.5,3.9,-41.3,2.3,-37.5,2.3,-36.3,0.6,-32.5,0.6,-30.0,3.1,-30.0,5.2,-27.5,5.6,-26.3,7.3,-15.8,7.3,-14.6,8.9,-5.8,8.9,-4.6,10.6,17.6,10.6,18.8,12.3,34.3,12.3,36.8,14.8,37.2,17.3,39.3,17.3,43.9,20.6,47.6,20.6,48.9,22.3,51.0,22.3,53.9,25.6,57.7,25.6,58.9,27.3,61.0,27.3,63.9,24.0,66.4,23.6,66.4,21.5,62.7,17.7,59.7,16.9,59.7,13.1,58.1,11.9,58.1,8.1,56.4,6.9,56.4,1.4,54.7,0.2,54.7,-1.9,51.0,-5.7,47.2,-5.7,46.0,-7.3,37.2,-7.3,35.9,-9.0,25.5,-9.0,24.3,-10.7,17.2,-10.7,12.6,-14.0,8.8,-14.0,7.6,-15.7,3.8,-15.7,2.5,-17.4,-1.2,-17.4,-2.5,-19.0,-11.2,-19.0,-12.5,-20.7,-21.3,-20.7,-22.5,-22.4,-44.6,-22.4,-46.3,-20.7,-49.2,-20.7,-50.9,-22.4,-53.0,-22.4,-54.2,-24.0,-56.3,-24.0,-56.7,-21.5,-54.2,-21.1,-53.0,-19.4,-44.2,-19.4,-43.0,-17.8,-40.9,-17.8,-39.6,-19.4,-38.0,-17.8,-25.8,-17.8,-25.0,-14.9,-27.5,-12.4,-29.6,-12.4,-34.2,-7.3,-39.6,-5.7,-42.5,-2.3,-44.6,-2.3,-45.9,-0.7,-48.0,-0.7,-49.2,1.0,-54.7,2.7,-57.6,6.0,-61.3,6.0,-62.2,7.3];
@@ -831,17 +841,20 @@ function gaitPose(rig,p,r,amp){
   const drift=(lo,hi,w)=>({v:0,dv:0,tg:0,tt:0,lo,hi,w});
   function stepDrift(d,dt){if((d.tt-=dt)<=0){d.tg=rnd(-1,1);d.tt=rnd(d.lo,d.hi)}
     d.dv+=(d.w*d.w*(d.tg-d.v)-1.6*d.w*d.dv)*dt;d.v+=d.dv*dt;return d.v}
-  const wings=lead=>({flap:false,ph:.75,beats:0,glide:lead?rnd(.5,4):1e9,g:1,tempo:2.1,cue:-1,started:false});
-  // one bird's wings: a bout of beats, each ending as the wings pass level, then a long glide; the wings ease into
-  // and out of the glide over about a second
+  // each bird has its own wingbeat rate and glide length; followers also open bouts of their own now and then
+  const wings=lead=>({flap:false,ph:0,n:0,amp:0,g:1,glide:lead?rnd(.5,4):rnd(5,14),base:rnd(1.95,2.3),tempo:2.1,cue:-1,started:false,since:9});
+  // one bird's wings: a bout of n complete beats, then a long glide. A bout starts late in a recovery so the wings
+  // rise out of the glide pose to the top and the first downstroke is already full; after the last downstroke the
+  // stroke fades out during the following recovery, as the wings come up to the glide pose. The stroke itself never
+  // stops while it fades, so nothing freezes, and every beat in between is at full depth
   function stepWings(w,f,lead,dt){
-    w.started=false;
-    if(w.flap){const before=w.ph;w.ph+=dt*w.tempo;
-      if(Math.floor(w.ph-.75)>Math.floor(before-.75)&&--w.beats<=0){w.flap=false;w.ph=Math.floor(w.ph-.75)+.75;
-        w.glide=lead?rnd(4.5,8)*(f.low?1.4:1):1e9}}                      // only the leader starts a bout
+    w.started=false;w.since+=dt;
+    if(w.flap){w.ph+=dt*w.tempo;const end=w.n-1+.8;
+      w.amp=smooth(-.22,.1,w.ph)*(1-smooth(w.n-1+.52,end,w.ph));
+      if(w.ph>=end){w.flap=false;w.amp=0;w.since=0;w.glide=(lead?rnd(4.5,8):rnd(6,14))*(f.low?1.4:1)}}
     else if(w.cue>=0&&(w.cue-=dt)<0||(w.glide-=dt)<=0){
-      w.flap=true;w.started=true;w.cue=-1;w.beats=f.low?2:Math.round(rnd(2,4));w.tempo=rnd(1.95,2.3)}
-    w.g+=((w.flap?0:1)-w.g)*(1-Math.exp(-dt*(w.flap?2.2:1.6)));
+      w.flap=true;w.started=true;w.cue=-1;w.n=f.low?2:Math.round(rnd(2,4));w.ph=-.22;w.tempo=w.base*rnd(.96,1.04)}
+    w.g=1-w.amp;
   }
 
   // formation shapes from the videos: a lopsided V, a check mark with a short arm, one diagonal line, or a long
@@ -872,8 +885,8 @@ function gaitPose(rig,p,r,amp){
     f.n=skein?Math.round(rnd(16,26)):Math.round(rnd(...f.count));f.birds=[];
     setShape(f,f.low||skein?'string':SHAPES[Math.floor(Math.random()*SHAPES.length)]);
     f.birds=f.slots.map((sl,i)=>({slot:i,size:rnd(.94,1.06),w:wings(i===0),alt:0,valt:0,fwd:0,pitch:0,
-      off:{b:sl.back,l:sl.lat,d:sl.drop},db:drift(1.5,3.5,.8),dl:drift(1.8,4,.7),dd:drift(1.8,4,.7)}));
-    f.reshape=rnd(8,16);
+      off:{b:sl.back,l:sl.lat,d:sl.drop},db:drift(1.5,3.5,.8),dl:drift(1.8,4,.7),dd:drift(1.8,4,.7),ge1:drift(4,9,.3),ge2:drift(4,9,.3)}));   // ge: a slow, slight change in the glide pose
+    f.reshape=rnd(14,26);
   }
   // mid-flight the flock can fly into a V and later stretch back out of it into a line or string. New slots are
   // dealt in the birds' current front-to-back order (the leader keeps the lead): leaving a V, the two arms merge
@@ -916,7 +929,7 @@ function gaitPose(rig,p,r,amp){
     f.C=[M[0]-dz/hl*bend*hl,M[1]+rnd(-.12,.12)*hl*.3,M[2]+dx/hl*bend*hl];
     f.D=(Math.hypot(dx,f.P1[1]-f.P0[1],dz)+Math.hypot(...f.C.map((c,i)=>c-f.P0[i]))+Math.hypot(...f.C.map((c,i)=>f.P1[i]-c)))/2;
     f.v=V*rnd(.9,1.1);f.flip=!left;
-    f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(10,20);layout(f);
+    f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(18,32);layout(f);
   }
   // a point on the curved path (a quadratic curve through C), and the path's level direction there; past either
   // end it carries straight on
@@ -929,14 +942,14 @@ function gaitPose(rig,p,r,amp){
   function stepFlock(f,dt,out){
     if(f.wait>0){if((f.wait-=dt)<=0)launch(f);else return}
     f.t+=dt;f.u+=f.v*(1+.1*stepDrift(f.gust,dt))*dt/f.D;
-    const u=f.u,air=(f.low?35:95)*stepDrift(f.air,dt);
+    const u=f.u,air=(f.low?30:70)*stepDrift(f.air,dt);
     // now and then a bird from the side moves up to lead, and the leader drops back into its slot
     // a lead change only happens as the leader opens a bout of wingbeats
-    if((f.swap-=dt)<=0&&f.birds.find(b=>b.slot===0)?.w.started){f.swap=rnd(14,26);
+    if((f.swap-=dt)<=0&&f.birds.find(b=>b.slot===0)?.w.started){f.swap=rnd(25,45);
       const lead=f.birds.find(b=>b.slot===0),cand=f.birds.filter(b=>f.slots[b.slot].rank===1);
       if(lead&&cand.length){const c=cand[Math.floor(Math.random()*cand.length)];[lead.slot,c.slot]=[c.slot,0];c.w.glide=Math.max(c.w.glide,2)}}
     // reshaping also waits for the leader to open a bout, so the whole flock moves into the new shape under power
-    if((f.reshape-=dt)<=0&&!f.low&&f.kind!=='skein'&&f.birds.find(b=>b.slot===0)?.w.started){f.reshape=rnd(10,20);reshape(f)}
+    if((f.reshape-=dt)<=0&&!f.low&&f.kind!=='skein'&&f.birds.find(b=>b.slot===0)?.w.started){f.reshape=rnd(18,35);reshape(f)}
     const bySlot=[];for(const b of f.birds)bySlot[b.slot]=b;
     // where each slot sits right now: every gap along an arm is its own length times a factor wandering
     // between about 0.55 and 1.45, so neighbours are always closing up or falling back
@@ -950,9 +963,10 @@ function gaitPose(rig,p,r,amp){
       stepWings(b.w,f,lead,dt);
       // the leader always opens a bout out of the glide; each bird behind joins a moment after the bird ahead,
       // so the beat runs down the line in order
+      // (most of the time: a bird that has only just finished a bout, or one in two of the rest, keeps gliding and
+      // flaps on its own timer instead, so the flock never beats in lockstep)
       if(lead&&b.w.glide>1e8)b.w.glide=rnd(1,3);
-      if(!lead&&b.w.glide<1e8&&!b.w.flap)b.w.glide=1e9;
-      if(!lead&&bySlot[sl.ahead].w.started&&!b.w.flap)b.w.cue=rnd(.2,.45);
+      if(!lead&&bySlot[sl.ahead].w.started&&!b.w.flap&&b.w.cue<0&&b.w.since>1.5&&Math.random()<.7)b.w.cue=rnd(.25,.6);
       // flapping lifts and pushes forward, gliding settles and eases back; springs keep the bird near its slot
       const fl=1-b.w.g;
       b.valt+=((fl*-11+(1-fl)*(f.low?.6:2.2)-b.alt*.12)-b.valt)*(1-Math.exp(-dt*.6));b.alt+=b.valt*dt;
@@ -962,9 +976,9 @@ function gaitPose(rig,p,r,amp){
       // moves to them quickly under power; in a glide it only eases slowly
       if(b.w.started){b.db.tt=b.dl.tt=b.dd.tt=0;f.gaps[b.slot].tt=0}
       const k=lead?.5:1,e=1-Math.exp(-dt*lerp(1.8,.25,b.w.g)),tg=T[b.slot];
-      b.off.b+=(tg.b+50*stepDrift(b.db,dt)*k-b.off.b)*e;
-      b.off.l+=(tg.l+70*stepDrift(b.dl,dt)*k-b.off.l)*e;
-      b.off.d+=(tg.d+40*stepDrift(b.dd,dt)*k-b.off.d)*e;
+      b.off.b+=(tg.b+40*stepDrift(b.db,dt)*k-b.off.b)*e;
+      b.off.l+=(tg.l+50*stepDrift(b.dl,dt)*k-b.off.l)*e;
+      b.off.d+=(tg.d+28*stepDrift(b.dd,dt)*k-b.off.d)*e;
       // each bird sits on the path itself, a little behind the leader, so the line follows the curve; its side
       // offset is taken across the path's direction at that point
       const back=b.off.b+b.fwd,[P,tx,tz]=pathAt(f,u-back/f.D);
@@ -974,11 +988,12 @@ function gaitPose(rig,p,r,amp){
       const X=P[0]-tz*b.off.l,Z=Math.max(400,P[2]+tx*b.off.l),Yd=P[1]+air+b.off.d+b.alt+b.sep;
       const sc=F/Z,x=CX+X*sc,y=CY+Yd*sc,s=sc*b.size;
       // the body rises a touch on each downstroke; the nose follows the bird's own climb or sink
-      const bob=-2.2*Math.sin(TAU*b.w.ph)*(1-b.w.g)*s;
-      b.pitch+=(Math.max(-.14,Math.min(.14,-b.valt/45))-b.pitch)*(1-Math.exp(-dt*2));
+      // the body is lifted by each downstroke and settles a touch on the recovery, a little behind the wings
+      const bob=1.1*stroke(b.w.ph-.12)*b.w.amp*s;
+      b.pitch+=(Math.max(-.08,Math.min(.08,-b.valt/60))-b.pitch)*(1-Math.exp(-dt*1.4));
       const near=Math.min(1,Math.max(0,(ZFAR-Z)/(ZFAR-ZNEAR)));b.sx=x;b.sy=y;b.ss=s;b.sc=sc;
       if(x>-300&&x<W+300&&fade>0){visible=true;
-        out.push({Z,x,y:y+bob,s,p:pose(b.w.ph,b.w.g),pitch:b.pitch,flip:f.flip,alpha:fade*(.5+.45*near),haze:(1-near)*.55})}
+        out.push({Z,x,y:y+bob,s,p:pose(b.w.ph,b.w.amp,{e1:GLIDE.e1+1.2*stepDrift(b.ge1,dt),e2:GLIDE.e2+2*stepDrift(b.ge2,dt),sw:GLIDE.sw}),pitch:b.pitch,flip:f.flip,alpha:fade*(.5+.45*near),haze:(1-near)*.55})}
     }
     // a brief overlap is fine; after about a second the bird further back drifts up or down out of the stack
     for(const b of f.birds)b.hit=null;
