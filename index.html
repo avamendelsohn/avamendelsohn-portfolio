@@ -916,7 +916,7 @@ function gaitPose(rig,p,r,amp){
   // bank in degrees per radian/second of turn, and its limit. The turns here are gentle (about 1.3 degrees a second
   // on a curved pass), so the bank is scaled up past strict physics to read at this size. It eases toward BANK_MAX:
   // about 9 degrees on a gentle curve, 12-17 on a typical one, close to 20 on the tightest, nothing on a straight one
-  const BANK_K=380,BANK_MAX=40;
+  const BANK_K=380,BANK_MAX=40,GL_DELAY=.35;
   // development only: add ?debugbank to the page address (or set true) to pick the largest pelican, label its
   // heading and bank, and hold it with keys 1 (-20), 2 (0), 3 (+20) or let it bank on its own with 4
   const DEBUG_BANK=false||/[?&]debugbank\b/.test(location.search);
@@ -1033,7 +1033,7 @@ function gaitPose(rig,p,r,amp){
     f.C=[M[0]-dz/hl*bend*hl,M[1]+rnd(-.12,.12)*hl*.3,M[2]+dx/hl*bend*hl];
     f.D=(Math.hypot(dx,f.P1[1]-f.P0[1],dz)+Math.hypot(...f.C.map((c,i)=>c-f.P0[i]))+Math.hypot(...f.C.map((c,i)=>f.P1[i]-c)))/2;
     f.v=V*rnd(.9,1.1);f.flip=!left;
-    f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(18,32);layout(f);
+    f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(18,32);layout(f);f.gl={t:0,dur:0,v:0,wait:rnd(6,16)};
   }
   // a point on the curved path (a quadratic curve through C), and the path's level direction there; past either
   // end it carries straight on
@@ -1047,6 +1047,11 @@ function gaitPose(rig,p,r,amp){
     if(f.wait>0){if((f.wait-=dt)<=0)launch(f);else return}
     f.t+=dt;f.u+=f.v*(1+.1*stepDrift(f.gust,dt))*dt/f.D;
     const u=f.u,air=(f.low?30:70)*stepDrift(f.air,dt);
+    // now and then the whole flock banks together: the leader leans first and each bird follows GL_DELAY seconds
+    // after the bird ahead of it, so the lean ripples back down the line
+    const gl=f.gl,maxRank=Math.max(1,...f.slots.map(s=>s.rank||0)),glStep=Math.min(GL_DELAY,5/maxRank),glEnd=gl.dur+glStep*maxRank;   // a long skein ripples faster so it finishes within about 5 s
+    if(gl.dur>0){if((gl.t+=dt)>=glEnd){gl.dur=0;gl.wait=rnd(12,28)}}
+    else if((gl.wait-=dt)<=0){gl.t=0;gl.dur=rnd(2.5,4.5);gl.v=(Math.random()<.5?-1:1)*rnd(15,30)}
     // now and then a bird from the side moves up to lead, and the leader drops back into its slot
     // a lead change only happens as the leader opens a bout of wingbeats
     if((f.swap-=dt)<=0&&f.birds.find(b=>b.slot===0)?.w.started){f.swap=rnd(25,45);
@@ -1101,8 +1106,9 @@ function gaitPose(rig,p,r,amp){
       // on top of the turn: a slow rocking on the air (up to about 8 degrees either way) and, every so often, a
       // deliberate lean of 15 to 32 degrees held for a couple of seconds and eased out again, as pelicans do when
       // they adjust their line or peel off
-      const ln=b.lean;if(ln.dur>0){ln.t+=dt;if(ln.t>=ln.dur){ln.dur=0;ln.wait=rnd(8,20)}}else if((ln.wait-=dt)<=0){ln.t=0;ln.dur=rnd(2,4);ln.v=(Math.random()<.5?-1:1)*rnd(15,32)}
-      const leanNow=ln.dur>0?ln.v*Math.sin(Math.PI*ln.t/ln.dur)**2:0;
+      const ln=b.lean;if(ln.dur>0){ln.t+=dt;if(ln.t>=ln.dur){ln.dur=0;ln.wait=rnd(8,20)}}else if(gl.dur===0&&(ln.wait-=dt)<=0){ln.t=0;ln.dur=rnd(2,4);ln.v=(Math.random()<.5?-1:1)*rnd(15,32)}
+      const gt=gl.t-glStep*(f.slots[b.slot].rank||0);
+      const leanNow=(ln.dur>0?ln.v*Math.sin(Math.PI*ln.t/ln.dur)**2:0)+(gl.dur>0&&gt>0&&gt<gl.dur?gl.v*Math.sin(Math.PI*gt/gl.dur)**2:0);
       const bankTg=DEBUG_BANK&&b===dbg.bird&&dbg.hold!==null?dbg.hold:Math.max(-BANK_MAX,Math.min(BANK_MAX,BANK_MAX*Math.tanh(BANK_K*b.turn/BANK_MAX)+8*stepDrift(b.rl,dt)+leanNow));
       b.bank+=(bankTg-b.bank)*(1-Math.exp(-dt*(DEBUG_BANK&&b===dbg.bird&&dbg.hold!==null?4:1.2)));
       // the body rises a touch on each downstroke; the nose follows the bird's own climb or sink
