@@ -777,9 +777,9 @@ function gaitPose(rig,p,r,amp){
   const warp=(k,K)=>k-K*Math.sin(TAU*k)/TAU;
   const stroke=ph=>{const u=ph-Math.floor(ph);                       // shoulder position: +1 at the top, -1 at the bottom
     return Math.cos(Math.PI*(u<DOWN?warp(u/DOWN,KD):1+warp((u-DOWN)/(1-DOWN),KU)))};
-  const ELB_FOLD=22,ELB_LIFT=6;                         // elbow fold back and forearm lift at the middle of the recovery, degrees
+  const ELB_BEND=12,ELB_LAG=.035;                       // the forearm trails the upper arm through the whole stroke, so the wing bends at the elbow as it flaps
   const flapPose=ph=>{const c=stroke(ph),u=ph-Math.floor(ph),up=u<DOWN?0:Math.sin(Math.PI*(u-DOWN)/(1-DOWN));
-    return {e1:SH_MID+SH_AMP*c,e2:-4+TIP*(stroke(ph-LAG)-c),sw:6+FLEX*up,ef:ELB_FOLD*up*up,ee:ELB_LIFT*up*up}};   // squared so the fold starts and ends with no jolt
+    return {e1:SH_MID+SH_AMP*c,e2:-4+TIP*(stroke(ph-LAG)-c),sw:6+FLEX*up,ef:0,ee:ELB_BEND*(stroke(ph-ELB_LAG)-c)}};
   // a=how much of the wingbeat is showing (0 gliding, 1 full stroke); gl=this bird's glide pose
   const pose=(ph,a,gl)=>{const f=flapPose(ph);return {e1:lerp(gl.e1,f.e1,a),e2:lerp(gl.e2,f.e2,a),sw:lerp(gl.sw,f.sw,a),ef:f.ef*a,ee:f.ee*a}};
   const smooth=(a,b,x)=>{const k=Math.min(1,Math.max(0,(x-a)/(b-a)));return k*k*(3-2*k)};
