@@ -777,10 +777,11 @@ function gaitPose(rig,p,r,amp){
   const warp=(k,K)=>k-K*Math.sin(TAU*k)/TAU;
   const stroke=ph=>{const u=ph-Math.floor(ph);                       // shoulder position: +1 at the top, -1 at the bottom
     return Math.cos(Math.PI*(u<DOWN?warp(u/DOWN,KD):1+warp((u-DOWN)/(1-DOWN),KU)))};
+  const ELB_FOLD=22,ELB_LIFT=6;                         // elbow fold back and forearm lift at the middle of the recovery, degrees
   const flapPose=ph=>{const c=stroke(ph),u=ph-Math.floor(ph),up=u<DOWN?0:Math.sin(Math.PI*(u-DOWN)/(1-DOWN));
-    return {e1:SH_MID+SH_AMP*c,e2:-4+TIP*(stroke(ph-LAG)-c),sw:6+FLEX*up}};
+    return {e1:SH_MID+SH_AMP*c,e2:-4+TIP*(stroke(ph-LAG)-c),sw:6+FLEX*up,ef:ELB_FOLD*up*up,ee:ELB_LIFT*up*up}};   // squared so the fold starts and ends with no jolt
   // a=how much of the wingbeat is showing (0 gliding, 1 full stroke); gl=this bird's glide pose
-  const pose=(ph,a,gl)=>{const f=flapPose(ph);return {e1:lerp(gl.e1,f.e1,a),e2:lerp(gl.e2,f.e2,a),sw:lerp(gl.sw,f.sw,a)}};
+  const pose=(ph,a,gl)=>{const f=flapPose(ph);return {e1:lerp(gl.e1,f.e1,a),e2:lerp(gl.e2,f.e2,a),sw:lerp(gl.sw,f.sw,a),ef:f.ef*a,ee:f.ee*a}};
   const smooth=(a,b,x)=>{const k=Math.min(1,Math.max(0,(x-a)/(b-a)));return k*k*(3-2*k)};
   const smooth5=(a,b,x)=>{const k=Math.min(1,Math.max(0,(x-a)/(b-a)));return k*k*k*(k*(6*k-15)+10)};   // gentler start: the wing doesn't dip as the stroke grows
 
@@ -828,13 +829,17 @@ function gaitPose(rig,p,r,amp){
   // either side at the torso's half-width (SHZ). Both wings use the same angles and size, so the far wing is simply
   // the near wing reflected through the body and projected; nothing is offset by hand
   const SHX=12,SHY=-7.5,SHZ=10,WLEN=1.24;
-  function wing(e1,e2,sw,side,len){
-    const c1=Math.cos(e1*D),s1=Math.sin(e1*D),c2=Math.cos((e1+e2)*D),s2=Math.sin((e1+e2)*D),cs=Math.cos(sw*D),ss=Math.sin(sw*D);
+  // three segments, like the real wing: upper arm (shoulder to ELBOW), forearm (elbow to WRIST) and hand. Each
+  // segment has its own lift and backward sweep: the forearm folds back at the elbow by ef (and rises ee more than
+  // the arm), and the hand adds e2 and sw on top at the wrist. In a glide and on the downstroke ef is 0 and the
+  // wing is a straight broad span; on the recovery the elbow and wrist both flex so the wing visibly bends
+  const ELBOW=20;
+  function wing(e1,e2,sw,side,len,ef=0,ee=0){
+    const segs=[[0,ELBOW*len,e1,0],[ELBOW*len,WRIST*len,e1+ee,ef],[WRIST*len,1e9,e1+ee+e2,ef+sw]].map(([a,b,el,sp])=>[a,b,Math.cos(el*D),Math.sin(el*D),Math.cos(sp*D),Math.sin(sp*D)]);
     ctx.beginPath();
     PLAN.forEach(([sp,ch],i)=>{
-      sp*=len;ch*=len;let x,y,z;const w=WRIST*len;
-      if(sp<=w){x=ch;y=-sp*s1;z=sp*c1}
-      else{const h=sp-w,hx=ch+h*ss,hs=h*cs;x=hx;y=-w*s1-hs*s2;z=w*c1+hs*c2}
+      sp*=len;ch*=len;let x=ch,y=0,z=0;
+      for(const [a,b,ce,se,cw,swn] of segs){if(sp<=a)break;const L=Math.min(sp,b)-a,d=L*cw;x+=L*swn;y-=d*se;z+=d*ce}
       z=(z+SHZ)*side;const [X,Y]=proj(SHX+x,SHY+y,z);
       i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);
     });
@@ -849,7 +854,7 @@ function gaitPose(rig,p,r,amp){
     // the bank is a roll of the whole bird about its long axis (see proj); positive lifts the near wing
     HK=d.hk;HYAW=d.hz;RC=Math.cos(d.bank*D);RS=Math.sin(d.bank*D);
     const p=d.p,q=d.asym,fa=q&&q.side<0?q:{e1:0,e2:0},na=q&&q.side>0?q:{e1:0,e2:0};
-    wing(p.e1+fa.e1,p.e2+fa.e2,p.sw,-1,WLEN);body();wing(p.e1+na.e1,p.e2+na.e2,p.sw,1,WLEN);
+    wing(p.e1+fa.e1,p.e2+fa.e2,p.sw,-1,WLEN,p.ef,p.ee);body();wing(p.e1+na.e1,p.e2+na.e2,p.sw,1,WLEN,p.ef,p.ee);
   }
 
   // ---- the birds fly in a 3D airspace, seen as if from a cliff above the water. Every bird has a world position
