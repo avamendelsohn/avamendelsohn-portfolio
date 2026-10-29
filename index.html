@@ -469,7 +469,7 @@ Object.assign(byId('wesharecare'),fromPreview('wesharecare-study'));
 // six studios, in the order you walk through them. A string is a project slide; {p,k} hangs pieces k of project p,
 // each opening that project. hang = [height in svh, vertical offset in svh, tilt] cycled across the pieces.
 const STUDIOS=[
- {id:'art',name:'Art',sub:'paint, print & wood',blurb:'BFA in studio art: painting, printmaking, drawing and woodworking.',
+ {id:'art',name:'Art',blurb:'BFA in studio art: painting, printmaking, drawing and woodworking.',
   pieces:{p:'art',k:[0,2,3,8,16,18,1,7,25]},hang:[[56,0],[42,-9],[50,7],[38,-6],[56,0],[42,-9],[50,7],[48,-4],[40,4]]},
  {id:'photo',name:'Photography',sub:'looking around',blurb:'Places I’ve been and things that caught my eye.',
   pieces:{p:'photo',k:[8,19,10,47,3,13]},hang:[[46,-2],[54,4],[50,-7],[40,6]]},
@@ -499,7 +499,7 @@ STUDIOS.forEach((st,si)=>{
     const [src,w,h]=IMAGES[sk||p][ix],[ph,y,rot]=st.hang[j%st.hang.length];
     return `<a class="piece" href="#/${p}" style="--r:${(w/h).toFixed(4)};--ph:${ph}svh;--y:${y}svh;--rot:${rot||0}deg" aria-label="${esc(P.title)}: piece ${j+1}"><span class="frame"><img src="${src}" alt="" width="${w}" height="${h}" loading="lazy"></span></a>`}).join('')}
   const count=st.slides?'See the projects':'See the gallery';
-  studios.insertAdjacentHTML('beforeend',`<section class="room ${st.id}" id="studio-${st.id}" data-name="${esc(st.name)}" aria-label="${esc(st.name)}"><header class="door"><span class="no">${String(si+1).padStart(2,'0')}</span><h2>${esc(st.name)}</h2><p class="sub">${esc(st.sub)}</p><p class="blurb">${esc(st.blurb)}</p><span class="count">${count} →</span></header>${items}</section>`);
+  studios.insertAdjacentHTML('beforeend',`<section class="room ${st.id}" id="studio-${st.id}" data-name="${esc(st.name)}" aria-label="${esc(st.name)}"><header class="door"><span class="no">${String(si+1).padStart(2,'0')}</span><h2>${esc(st.name)}</h2>${st.sub?`<p class="sub">${esc(st.sub)}</p>`:''}<p class="blurb">${esc(st.blurb)}</p><span class="count">${count} →</span></header>${items}</section>`);
 });
 $('#top').dataset.name='Hello';$('#about').dataset.name='About';
 
