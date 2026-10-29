@@ -770,15 +770,19 @@ function gaitPose(rig,p,r,amp){
   // late, so the outer wing trails up through the downstroke and down through the recovery and the wing curves
   // instead of hinging; on the recovery the wrist flexes a little and the hand sweeps back.
   const GLIDE={e1:4,e2:-9,sw:7};                       // arms just above level, hands a little lower: the broad, slightly bowed glide
-  const DOWN=.55,KD=.35,SH_MID=8,SH_AMP=46,LAG=.07,TIP=22,FLEX=9;
+  // Both halves are warped the same way (slow at the ends, fast in the middle) and KU is set so the stroke angle turns
+  // at the same rate on both sides of the top and of the bottom: speed and acceleration carry straight through each
+  // reversal, so the wing turns over without a kink
+  const DOWN=.53,KD=.3,KU=1-(1-KD)*(1-DOWN)/DOWN,SH_MID=8,SH_AMP=46,LAG=.07,TIP=18,FLEX=8;
+  const warp=(k,K)=>k-K*Math.sin(TAU*k)/TAU;
   const stroke=ph=>{const u=ph-Math.floor(ph);                       // shoulder position: +1 at the top, -1 at the bottom
-    if(u<DOWN){const k=u/DOWN;return Math.cos(Math.PI*(k-KD*Math.sin(TAU*k)/TAU))}
-    return Math.cos(Math.PI*(1+(u-DOWN)/(1-DOWN)))};
+    return Math.cos(Math.PI*(u<DOWN?warp(u/DOWN,KD):1+warp((u-DOWN)/(1-DOWN),KU)))};
   const flapPose=ph=>{const c=stroke(ph),u=ph-Math.floor(ph),up=u<DOWN?0:Math.sin(Math.PI*(u-DOWN)/(1-DOWN));
     return {e1:SH_MID+SH_AMP*c,e2:-4+TIP*(stroke(ph-LAG)-c),sw:6+FLEX*up}};
   // a=how much of the wingbeat is showing (0 gliding, 1 full stroke); gl=this bird's glide pose
   const pose=(ph,a,gl)=>{const f=flapPose(ph);return {e1:lerp(gl.e1,f.e1,a),e2:lerp(gl.e2,f.e2,a),sw:lerp(gl.sw,f.sw,a)}};
   const smooth=(a,b,x)=>{const k=Math.min(1,Math.max(0,(x-a)/(b-a)));return k*k*(3-2*k)};
+  const smooth5=(a,b,x)=>{const k=Math.min(1,Math.max(0,(x-a)/(b-a)));return k*k*k*(k*(6*k-15)+10)};   // gentler start: the wing doesn't dip as the stroke grows
 
   // ---- drawing, in bird units (about 135 long, facing left)
   const BODY=[-68.4,9.8,-68.0,10.6,-64.3,10.6,-62.6,8.9,-57.6,8.9,-56.3,7.3,-52.6,7.3,-51.3,5.6,-47.6,5.6,-46.3,3.9,-42.5,3.9,-41.3,2.3,-37.5,2.3,-36.3,0.6,-32.5,0.6,-30.0,3.1,-30.0,5.2,-27.5,5.6,-26.3,7.3,-15.8,7.3,-14.6,8.9,-5.8,8.9,-4.6,10.6,17.6,10.6,18.8,12.3,34.3,12.3,36.8,14.8,37.2,17.3,39.3,17.3,43.9,20.6,47.6,20.6,48.9,22.3,51.0,22.3,53.9,25.6,57.7,25.6,58.9,27.3,61.0,27.3,63.9,24.0,66.4,23.6,66.4,21.5,62.7,17.7,59.7,16.9,59.7,13.1,58.1,11.9,58.1,8.1,56.4,6.9,56.4,1.4,54.7,0.2,54.7,-1.9,51.0,-5.7,47.2,-5.7,46.0,-7.3,37.2,-7.3,35.9,-9.0,25.5,-9.0,24.3,-10.7,17.2,-10.7,12.6,-14.0,8.8,-14.0,7.6,-15.7,3.8,-15.7,2.5,-17.4,-1.2,-17.4,-2.5,-19.0,-11.2,-19.0,-12.5,-20.7,-21.3,-20.7,-22.5,-22.4,-44.6,-22.4,-46.3,-20.7,-49.2,-20.7,-50.9,-22.4,-53.0,-22.4,-54.2,-24.0,-56.3,-24.0,-56.7,-21.5,-54.2,-21.1,-53.0,-19.4,-44.2,-19.4,-43.0,-17.8,-40.9,-17.8,-39.6,-19.4,-38.0,-17.8,-25.8,-17.8,-25.0,-14.9,-27.5,-12.4,-29.6,-12.4,-34.2,-7.3,-39.6,-5.7,-42.5,-2.3,-44.6,-2.3,-45.9,-0.7,-48.0,-0.7,-49.2,1.0,-54.7,2.7,-57.6,6.0,-61.3,6.0,-62.2,7.3];
@@ -796,6 +800,7 @@ function gaitPose(rig,p,r,amp){
     [107,5],[103,6],[104,8.5],[99,8.5],[100,11],[94,11],[94.5,13.5],[88,13.5],[88,16],[81,16.5],
     [72,18.5],[58,20.5],[44,21.5],[30,21],[16,20],[6,17.5],[0,15]];
   const WRIST=44,TILT=Math.sin(14*D),YAW=Math.sin(13*D);
+  let HK=1,HYAW=0;   // this bird's heading: foreshortening of its length, and how far it is turned toward (-) or away (+)
   function wing(e1,e2,sw,side,ox,oy,len){
     const c1=Math.cos(e1*D),s1=Math.sin(e1*D),c2=Math.cos((e1+e2)*D),s2=Math.sin((e1+e2)*D),cs=Math.cos(sw*D),ss=Math.sin(sw*D);
     ctx.beginPath();
@@ -803,7 +808,7 @@ function gaitPose(rig,p,r,amp){
       sp*=len;ch*=len;let x,y,z;const w=WRIST*len;
       if(sp<=w){x=ch;y=-sp*s1;z=sp*c1}
       else{const h=sp-w,hx=ch+h*ss,hs=h*cs;x=hx;y=-w*s1-hs*s2;z=w*c1+hs*c2}
-      z*=side;const X=ox+x+z*YAW,Y=oy+y+z*TILT;
+      z*=side;const X=(ox+x)*HK+z*(YAW-HYAW),Y=oy+y+z*TILT;
       i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);
     });
     ctx.closePath();ctx.fill();
@@ -814,7 +819,8 @@ function gaitPose(rig,p,r,amp){
     const k=d.s*dpr,fx=d.flip?-1:1,c=Math.cos(d.pitch*fx)*k,sn=Math.sin(d.pitch*fx)*k;
     ctx.setTransform(c*fx,sn*fx,-sn,c,dpr*d.x,dpr*d.y);ctx.globalAlpha=d.alpha;
     const h=d.haze;ctx.fillStyle=`rgb(${Math.round(23+177*h)},${Math.round(19+131*h)},${Math.round(27+103*h)})`;
-    const p=d.p;wing(p.e1-4,p.e2,p.sw,-1,16,-9,1.2);body();wing(p.e1,p.e2,p.sw,1,8,-6,1.28);
+    // a bank is a roll about the body's long axis: one wing's elevation rises by the bank and the other's falls
+    HK=d.hk;HYAW=d.hz;const p=d.p;wing(p.e1-4-d.bank,p.e2,p.sw,-1,16,-9,1.2);ctx.save();ctx.scale(HK,1);body();ctx.restore();wing(p.e1+d.bank,p.e2,p.sw,1,8,-6,1.28);
   }
 
   // ---- the birds fly in a 3D airspace, seen as if from a cliff above the water. Every bird has a world position
@@ -834,7 +840,8 @@ function gaitPose(rig,p,r,amp){
   let W=0,H=0,dpr=1,F=1,CX=0,CY=0;
   function size(){W=intro.clientWidth;H=intro.clientHeight;dpr=Math.min(2,devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;
     F=Math.max(W*.9,H*.7);CX=W*.5;CY=H*.14}
-  const ZFAR=14000,ZNEAR=2000,V=620;                      // depth range in bird units (a bird is ~135 long); flight speed
+  const ZFAR=14000,ZNEAR=2000,V=620;
+  const BANK_K=160,BANK_MAX=12;                           // bank in degrees per radian/second of turn, and its limit                      // depth range in bird units (a bird is ~135 long); flight speed
   const toWorld=(x,y,Z)=>[(x-CX)*Z/F,(y-CY)*Z/F,Z];
 
   // a smooth wander: a soft spring chasing a target in [-1,1] that moves to a new spot every few seconds
@@ -843,17 +850,18 @@ function gaitPose(rig,p,r,amp){
     d.dv+=(d.w*d.w*(d.tg-d.v)-1.6*d.w*d.dv)*dt;d.v+=d.dv*dt;return d.v}
   // each bird has its own wingbeat rate and glide length; followers also open bouts of their own now and then
   const wings=lead=>({flap:false,ph:0,n:0,amp:0,g:1,glide:lead?rnd(.5,4):rnd(5,14),base:rnd(1.95,2.3),tempo:2.1,cue:-1,started:false,since:9});
-  // one bird's wings: a bout of n complete beats, then a long glide. A bout starts late in a recovery so the wings
-  // rise out of the glide pose to the top and the first downstroke is already full; after the last downstroke the
-  // stroke fades out during the following recovery, as the wings come up to the glide pose. The stroke itself never
+  // one bird's wings: a bout of n complete beats, then a long glide. A bout opens with a whole recovery in which the
+  // stroke grows from nothing, so the wings lift smoothly out of the glide pose to the top and the first downstroke
+  // is full; after the last downstroke the stroke fades away over a whole recovery as the wings rise back to the
+  // glide pose. The stroke itself never
   // stops while it fades, so nothing freezes, and every beat in between is at full depth
   function stepWings(w,f,lead,dt){
     w.started=false;w.since+=dt;
-    if(w.flap){w.ph+=dt*w.tempo;const end=w.n-1+.8;
-      w.amp=smooth(-.22,.1,w.ph)*(1-smooth(w.n-1+.52,end,w.ph));
+    if(w.flap){w.ph+=dt*w.tempo;const end=w.n-1+1;
+      w.amp=smooth5(-.47,.02,w.ph)*(1-smooth(w.n-1+DOWN,end,w.ph));
       if(w.ph>=end){w.flap=false;w.amp=0;w.since=0;w.glide=(lead?rnd(4.5,8):rnd(6,14))*(f.low?1.4:1)}}
     else if(w.cue>=0&&(w.cue-=dt)<0||(w.glide-=dt)<=0){
-      w.flap=true;w.started=true;w.cue=-1;w.n=f.low?2:Math.round(rnd(2,4));w.ph=-.22;w.tempo=w.base*rnd(.96,1.04)}
+      w.flap=true;w.started=true;w.cue=-1;w.n=f.low?2:Math.round(rnd(2,4));w.ph=-.47;w.tempo=w.base*rnd(.96,1.04)}
     w.g=1-w.amp;
   }
 
@@ -987,13 +995,21 @@ function gaitPose(rig,p,r,amp){
       b.sepTg*=Math.exp(-dt/14);b.sep+=(b.sepTg-b.sep)*(1-Math.exp(-dt*.9));
       const X=P[0]-tz*b.off.l,Z=Math.max(400,P[2]+tx*b.off.l),Yd=P[1]+air+b.off.d+b.alt+b.sep;
       const sc=F/Z,x=CX+X*sc,y=CY+Yd*sc,s=sc*b.size;
+      // heading: the bird faces along the path (its level direction tx,tz), eased so it turns smoothly. Seen from the
+      // side, a bird angled toward or away from us looks shorter and its wings swing out across the view; the rate the
+      // heading turns sets a gentle bank, into the turn (the inside wing dips), levelling out again on the straight
+      const hd=Math.atan2(tz,Math.abs(tx));
+      if(b.hd===undefined){b.hd=hd;b.turn=0;b.bank=0}
+      const dh=(hd-b.hd)*(1-Math.exp(-dt*2.5));b.hd+=dh;
+      b.turn+=((dt>0?dh/dt:0)-b.turn)*(1-Math.exp(-dt*1.5));
+      b.bank+=(Math.max(-BANK_MAX,Math.min(BANK_MAX,BANK_K*b.turn))-b.bank)*(1-Math.exp(-dt*1.2));
       // the body rises a touch on each downstroke; the nose follows the bird's own climb or sink
       // the body is lifted by each downstroke and settles a touch on the recovery, a little behind the wings
       const bob=1.1*stroke(b.w.ph-.12)*b.w.amp*s;
       b.pitch+=(Math.max(-.08,Math.min(.08,-b.valt/60))-b.pitch)*(1-Math.exp(-dt*1.4));
       const near=Math.min(1,Math.max(0,(ZFAR-Z)/(ZFAR-ZNEAR)));b.sx=x;b.sy=y;b.ss=s;b.sc=sc;
       if(x>-300&&x<W+300&&fade>0){visible=true;
-        out.push({Z,x,y:y+bob,s,p:pose(b.w.ph,b.w.amp,{e1:GLIDE.e1+1.2*stepDrift(b.ge1,dt),e2:GLIDE.e2+2*stepDrift(b.ge2,dt),sw:GLIDE.sw}),pitch:b.pitch,flip:f.flip,alpha:fade*(.5+.45*near),haze:(1-near)*.55})}
+        out.push({Z,x,y:y+bob,s,hk:Math.cos(b.hd),hz:Math.sin(b.hd),bank:b.bank,p:pose(b.w.ph,b.w.amp,{e1:GLIDE.e1+1.2*stepDrift(b.ge1,dt),e2:GLIDE.e2+2*stepDrift(b.ge2,dt),sw:GLIDE.sw}),pitch:b.pitch,flip:f.flip,alpha:fade*(.5+.45*near),haze:(1-near)*.55})}
     }
     // a brief overlap is fine; after about a second the bird further back drifts up or down out of the stack
     for(const b of f.birds)b.hit=null;
