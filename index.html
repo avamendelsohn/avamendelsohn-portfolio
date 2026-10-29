@@ -582,8 +582,9 @@ function update(force){
 }
 // phone browsers colour their bars from the page: match the bottom (and top) to whatever room is on screen
 const themeMeta=document.head.appendChild(Object.assign(document.createElement('meta'),{name:'theme-color'}));let tinted='';
+const CRIOS=/CriOS/.test(navigator.userAgent);   // Chrome on iPhone paints both bars one page colour: on the home sunset use the sky
 function tint(r){const ch=document.getElementById('chapter'),open=ch&&!ch.hidden,home=!open&&r&&r.classList.contains('intro');
-  const bot=open?getComputedStyle(ch).backgroundColor:home?'#56535c':getComputedStyle(r).backgroundColor,top=home?'#ead7bb':bot;
+  const bot=open?getComputedStyle(ch).backgroundColor:home?(CRIOS?'#ead7bb':'#56535c'):getComputedStyle(r).backgroundColor,top=home?'#ead7bb':bot;
   if(bot+top===tinted)return;tinted=bot+top;document.documentElement.style.backgroundColor=bot;document.body.style.backgroundColor=bot;themeMeta.content=top}
 new MutationObserver(()=>update(true)).observe(document.getElementById('chapter'),{attributes:true,attributeFilter:['hidden','style','class']});
 function goTo(el,center){const r=el.getBoundingClientRect();scrollTo({top:walk.offsetTop+X+r.left-(center?(innerWidth-r.width)/2:0),behavior:reduce?'auto':'smooth'})}
