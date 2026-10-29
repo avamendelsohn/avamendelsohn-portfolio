@@ -777,17 +777,26 @@ function gaitPose(rig,p,r,amp){
   const warp=(k,K)=>k-K*Math.sin(TAU*k)/TAU;
   const stroke=ph=>{const u=ph-Math.floor(ph);                       // shoulder position: +1 at the top, -1 at the bottom
     return Math.cos(Math.PI*(u<DOWN?warp(u/DOWN,KD):1+warp((u-DOWN)/(1-DOWN),KU)))};
-  const ELB_BEND=12,ELB_LAG=.035;                       // the forearm trails the upper arm through the whole stroke, so the wing bends at the elbow as it flaps
-  const flapPose=ph=>{const c=stroke(ph),u=ph-Math.floor(ph),up=u<DOWN?0:Math.sin(Math.PI*(u-DOWN)/(1-DOWN));
-    return {e1:SH_MID+SH_AMP*c,e2:-4+TIP*(stroke(ph-LAG)-c),sw:6+FLEX*up,ef:0,ee:ELB_BEND*(stroke(ph-ELB_LAG)-c)}};
+  // The bend travels outward from the shoulder as a wave: the forearm repeats the shoulder's stroke ELB_DELAY later,
+  // and the hand repeats the forearm's stroke HAND_DELAY after that (at HAND_K strength). On the recovery both joints
+  // also flex down: the elbow leads the wing up while the forearm hangs ELB_DROP x BEND below the upper arm, and a
+  // little later (WR_DELAY) the hand hangs WR_DROP x BEND below the forearm. Both rise and fall as sin^2, so they
+  // start and end with no jolt and the wing is open again before the next downstroke. Nothing sweeps back: the
+  // joints only bend up and down, and the hand keeps the outline's own small backward angle (6)
+  const ELB_DELAY=.035,HAND_DELAY=.06,HAND_K=18,BEND=12,ELB_DROP=1.2,WR_DROP=1,WR_DELAY=.12;
+  const sin2=t=>t<=0||t>=1?0:Math.sin(Math.PI*t)**2;
+  const flapPose=ph=>{const c=stroke(ph),u=ph-Math.floor(ph),t=u<DOWN?-1:(u-DOWN)/(1-DOWN);
+    const fore=stroke(ph-ELB_DELAY),ee=SH_AMP*(fore-c),e2=-4+HAND_K*(stroke(ph-ELB_DELAY-HAND_DELAY)-fore);
+    return {e1:SH_MID+SH_AMP*c,ee:ee-ELB_DROP*BEND*sin2(t),e2:e2-WR_DROP*BEND*sin2((t-WR_DELAY)/(1-WR_DELAY)),sw:6,ef:0}};
   // a=how much of the wingbeat is showing (0 gliding, 1 full stroke); gl=this bird's glide pose
   const pose=(ph,a,gl)=>{const f=flapPose(ph);return {e1:lerp(gl.e1,f.e1,a),e2:lerp(gl.e2,f.e2,a),sw:lerp(gl.sw,f.sw,a),ef:f.ef*a,ee:f.ee*a}};
   const smooth=(a,b,x)=>{const k=Math.min(1,Math.max(0,(x-a)/(b-a)));return k*k*(3-2*k)};
   const smooth5=(a,b,x)=>{const k=Math.min(1,Math.max(0,(x-a)/(b-a)));return k*k*k*(k*(6*k-15)+10)};   // gentler start: the wing doesn't dip as the stroke grows
 
   // ---- drawing, in bird units (about 135 long, facing left)
-  // traced from Ava's photo; the tail section is turned up 20 degrees so it sits level with the body
-  const BODY=[-68.4,9.8,-68.0,10.6,-64.3,10.6,-62.6,8.9,-57.6,8.9,-56.3,7.3,-52.6,7.3,-51.3,5.6,-47.6,5.6,-46.3,3.9,-42.5,3.9,-41.3,2.3,-37.5,2.3,-36.3,0.6,-32.5,0.6,-30.0,3.1,-30.0,5.2,-27.5,5.6,-26.3,7.3,-15.8,7.3,-14.6,8.9,-5.8,8.9,-4.6,10.6,17.6,10.6,18.8,12.3,34.3,12.3,37.0,14.8,37.6,17.3,40.4,17.0,47.0,18.7,51.9,16.6,54.0,17.3,56.4,16.1,60.2,18.2,63.8,16.9,65.5,18.1,67.5,17.3,69.1,13.3,71.3,12.0,70.6,10.0,65.8,7.7,62.7,8.0,61.4,4.4,59.5,3.9,58.2,0.3,56.2,-0.3,54.3,-5.4,52.3,-6.0,51.6,-7.9,46.8,-10.2,44.1,-8.4,42.9,-9.4,36.9,-7.3,35.9,-9.0,25.5,-9.0,24.3,-10.7,17.2,-10.7,12.6,-14.0,8.8,-14.0,7.6,-15.7,3.8,-15.7,2.5,-17.4,-1.2,-17.4,-2.5,-19.0,-11.2,-19.0,-16.5,-19.1,-20.8,-18.5,-23.5,-17.1,-25.0,-15.5,-25.0,-14.9,-27.5,-12.4,-29.6,-12.4,-34.2,-7.3,-39.6,-5.7,-42.5,-2.3,-44.6,-2.3,-45.9,-0.7,-48.0,-0.7,-49.2,1.0,-54.7,2.7,-57.6,6.0,-61.3,6.0,-62.2,7.3];
+  // traced from Ava's side-view photo (the wing left out; back and belly behind it estimated), with the bill a
+  // little longer, the middle a little deeper and a small notch where the pouch meets the S-folded neck
+  const BODY=[-70.0,4.8,-67.7,4.4,-56.5,2.6,-43.1,-0.3,-33.1,-2.8,-27.8,-4.8,-25.4,-4.6,-23.9,-3.6,-25.6,-2.4,-28.7,-2.7,-28.3,-0.0,-25.8,2.5,-21.3,4.6,-16.3,6.6,-4.7,9.0,11.9,10.0,28.5,8.9,41.0,6.4,53.4,5.0,61.7,5.1,69.2,5.8,71.3,4.3,69.4,2.2,61.7,-1.2,53.4,-3.2,41.0,-7.3,20.2,-12.9,3.6,-14.1,0.7,-14.5,-0.1,-17.5,-1.8,-19.3,-6.4,-21.0,-13.0,-21.8,-21.3,-19.9,-25.0,-17.6,-47.5,-6.6,-67.3,1.2,-69.7,1.5,-71.5,2.6,-71.3,4.1];
   function body(){
     const n=BODY.length/2,P=i=>proj(BODY[(i%n)*2],BODY[(i%n)*2+1],0);
     ctx.beginPath();let [x0,y0]=P(0),[x1,y1]=P(1);ctx.moveTo((x0+x1)/2,(y0+y1)/2);
@@ -803,12 +812,23 @@ function gaitPose(rig,p,r,amp){
     ctx.fill();
   }
   let TORSO=null;
+  const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+  // half-width of the body seen from above, bill to tail, in bird units (Ava's traced side outline sets the height).
+  // Long flat bill, a rounded head, the short thick neck tucked into the shoulders, the broad chest and back, then a
+  // fan-shaped tail that is wider than it is deep
+  const WIDTH=[[-68.4,.5],[-60,1.6],[-45,2.2],[-34,2.8],[-30,4.4],[-26,6.2],[-21,6.8],[-15,6.6],[-8,8.6],[0,11.8],[10,13.4],[24,13.4],[38,11.4],[48,8.6],[56,6.6],[63,7.2],[68,5.8],[71.3,2.4]];
+  const halfW=x=>{for(let i=0;i<WIDTH.length-1;i++){const [x0,w0]=WIDTH[i],[x1,w1]=WIDTH[i+1];if(x<=x1){const k=clamp((x-x0)/(x1-x0),0,1),s=k*k*(3-2*k);return w0+(w1-w0)*s}}return .4};
   function torso(){const n=BODY.length/2,out=[];
-    for(let x=-22;x<=54;x+=3){let lo=1e9,hi=-1e9;
+    for(let x=-71.5;x<=70.5;x+=1.5){const ys=[];
       for(let i=0;i<n;i++){const x1=BODY[i*2],y1=BODY[i*2+1],x2=BODY[((i+1)%n)*2],y2=BODY[((i+1)%n)*2+1];
-        if((x1-x)*(x2-x)<=0&&x1!==x2){const y=y1+(y2-y1)*(x-x1)/(x2-x1);lo=Math.min(lo,y);hi=Math.max(hi,y)}}
-      const hh=(hi-lo)/2*.92,b=.8*hh*Math.sqrt(Math.sin(Math.PI*(x+24)/80));
-      out.push({x,c:(lo+hi)/2,b,a:Math.sqrt(Math.max(1,hh*hh-b*b*TILT*TILT))})}
+        if((x1-x)*(x2-x)<0||(x1===x&&x2!==x))ys.push(y1+(y2-y1)*(x-x1)/(x2-x1))}
+      ys.sort((a,b)=>a-b);
+      // the outline crossings pair up into filled spans (more than one where the head overhangs the neck)
+      for(let k=0;k+1<ys.length;k+=2){const lo=ys[k],hi=ys[k+1];if(hi-lo<.5)continue;
+        // each cross-section is as tall as the traced outline (a little inside it) and halfW wide; a is shrunk so the
+        // section never pokes outside the outline in the site's camera view
+        const hh=(hi-lo)/2*.94,b=Math.min(halfW(x),hh*1.6);
+        out.push({x,c:(lo+hi)/2,b,a:Math.sqrt(Math.max(.25,hh*hh-b*b*TILT*TILT))})}}
     return out}
   // The wing is a real brown-pelican planform (seen from above: long broad arm, forward-bent wrist, slotted
   // fingertip primaries), measured as [span, chord] from the shoulder. It is lifted in 3D (arm by e1, hand by a
@@ -833,14 +853,32 @@ function gaitPose(rig,p,r,amp){
   // segment has its own lift and backward sweep: the forearm folds back at the elbow by ef (and rises ee more than
   // the arm), and the hand adds e2 and sw on top at the wrist. In a glide and on the downstroke ef is 0 and the
   // wing is a straight broad span; on the recovery the elbow and wrist both flex so the wing visibly bends
-  const ELBOW=20;
+  const ELBOW=20,TIPS=107;
+  // The wing is one continuous surface on a jointed skeleton: a spanwise line from the shoulder whose lift and
+  // backward angle change smoothly along the span. Each joint's bend is spread over a short zone around it (+-5
+  // units), so the line curves through the elbow and wrist instead of creasing; a little of the hand's bend (CURL) is
+  // spread along the hand up to where the primaries separate, so the separated feathers stay straight. Every outline
+  // point sits at its span position on that line, offset by its chord along the local chord direction, so the edges
+  // and feathers follow the bones. The outline is resampled every 2 units (keeping all its corners) so curves show
+  const ZE=5,ZW=5,CURL=.2,CURL_END=88,STEP=1;
+  const sstep=(s,j,w)=>{const k=Math.min(1,Math.max(0,(s-j+w)/(2*w)));return k*k*(3-2*k)};
+  const DENSE=(()=>{const out=[];for(let i=0;i<PLAN.length;i++){const a=PLAN[i],b=PLAN[(i+1)%PLAN.length],n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/2));
+    for(let k=0;k<n;k++)out.push([lerp(a[0],b[0],k/n),lerp(a[1],b[1],k/n)])}return out})();
+  const C=[[0,0,0]];
   function wing(e1,e2,sw,side,len,ef=0,ee=0){
-    const segs=[[0,ELBOW*len,e1,0],[ELBOW*len,WRIST*len,e1+ee,ef],[WRIST*len,1e9,e1+ee+e2,ef+sw]].map(([a,b,el,sp])=>[a,b,Math.cos(el*D),Math.sin(el*D),Math.cos(sp*D),Math.sin(sp*D)]);
+    const el=s=>e1+ee*sstep(s,ELBOW,ZE)+e2*((1-CURL)*sstep(s,WRIST,ZW)+CURL*Math.min(1,Math.max(0,(s-WRIST)/(CURL_END-WRIST)))),
+          swp=s=>ef*sstep(s,ELBOW,ZE)+sw*sstep(s,WRIST,ZW);
+    const N=Math.ceil((TIPS+4)/STEP);
+    for(let i=0;i<N;i++){const s=(i+.5)*STEP,e=el(s)*D,w=swp(s)*D,[x,y,z]=C[i];
+      C[i+1]=[x+STEP*len*Math.sin(w),y-STEP*len*Math.cos(w)*Math.sin(e),z+STEP*len*Math.cos(w)*Math.cos(e)]}
+    // the wing root: a flat plate from the body's midline out to the shoulder, as long as the root chord. The
+    // shoulder is the wing's pivot, so the wing stays joined to the body at every angle
+    ctx.beginPath();[[-9,0],[-9,SHZ],[15,SHZ],[15,0]].forEach(([x,z],i)=>{const [X,Y]=proj(SHX+x*len,SHY,z*side);i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)});ctx.closePath();ctx.fill();
     ctx.beginPath();
-    PLAN.forEach(([sp,ch],i)=>{
-      sp*=len;ch*=len;let x=ch,y=0,z=0;
-      for(const [a,b,ce,se,cw,swn] of segs){if(sp<=a)break;const L=Math.min(sp,b)-a,d=L*cw;x+=L*swn;y-=d*se;z+=d*ce}
-      z=(z+SHZ)*side;const [X,Y]=proj(SHX+x,SHY+y,z);
+    DENSE.forEach(([sp,ch],i)=>{
+      const f=Math.min(N,Math.max(0,sp/STEP)),k0=Math.min(N-1,Math.floor(f)),k=f-k0,A=C[k0],B=C[k0+1],e=el(sp)*D,w=swp(sp)*D,L=ch*len;
+      const x=lerp(A[0],B[0],k)+L*Math.cos(w),y=lerp(A[1],B[1],k)+L*Math.sin(w)*Math.sin(e),z=lerp(A[2],B[2],k)-L*Math.sin(w)*Math.cos(e);
+      const [X,Y]=proj(SHX+x,SHY+y,(z+SHZ)*side);
       i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);
     });
     ctx.closePath();ctx.fill();
@@ -878,7 +916,7 @@ function gaitPose(rig,p,r,amp){
   // bank in degrees per radian/second of turn, and its limit. The turns here are gentle (about 1.3 degrees a second
   // on a curved pass), so the bank is scaled up past strict physics to read at this size. It eases toward BANK_MAX:
   // about 9 degrees on a gentle curve, 12-17 on a typical one, close to 20 on the tightest, nothing on a straight one
-  const BANK_K=380,BANK_MAX=20;
+  const BANK_K=380,BANK_MAX=40;
   // development only: add ?debugbank to the page address (or set true) to pick the largest pelican, label its
   // heading and bank, and hold it with keys 1 (-20), 2 (0), 3 (+20) or let it bank on its own with 4
   const DEBUG_BANK=false||/[?&]debugbank\b/.test(location.search);
