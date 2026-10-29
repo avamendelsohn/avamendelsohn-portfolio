@@ -295,6 +295,13 @@ body{font-family:"Asap",system-ui,sans-serif}
 .contact{font-size:15px!important;gap:3px 11px!important}.contact dt svg{width:14px!important;height:14px!important}
 .walker{width:28px!important;height:56px!important;bottom:calc(17px + env(safe-area-inset-bottom,0px))!important}@media (max-width:640px){.walker{width:22px!important;height:44px!important}}
 </style>
+<style id="name-big">
+/* home: big orange name top left, timeline sits just left of Studios / About (delete this block to go back) */
+.intro header .name{font-size:clamp(44px,7vw,124px)!important;line-height:.9!important;letter-spacing:-.01em!important;color:#c2501d}
+.hud .mid{transition:transform .3s ease}
+.hud:not(.out) .mid{transform:translateX(var(--mx,0px))}
+@media (max-width:760px){.intro header{flex-direction:column;gap:14px}.intro header .name{font-size:clamp(38px,12vw,64px)!important}}
+</style>
 </head>
 <body>
 
@@ -351,10 +358,9 @@ body{font-family:"Asap",system-ui,sans-serif}
 <div class="rail" id="rail">
 <section class="intro" id="top" aria-label="Introduction">
   <header>
-    <p class="name">Ava Mendelsohn</p>
+    <h1 class="name">Ava<br>Mendelsohn</h1>
     <nav class="nav"><a href="#studios">Studios</a><a href="#about">About</a></nav>
   </header>
-  <p class="statement">Selected work and <span class="serif">other explorations.</span></p>
   <footer>
     <dl class="contact">
       <dt><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" role="img" aria-label="Email"><rect x="2" y="4.5" width="20" height="15" rx="1.5"/><path d="M2.5 5.5 12 13l9.5-7.5"/></svg></dt><dd><a href="mailto:avacmendelsohn@gmail.com">avacmendelsohn@gmail.com</a></dd>
@@ -555,6 +561,12 @@ addEventListener('resize',layout);addEventListener('load',layout);layout();
 const alignTag=()=>{const st=document.querySelector('.statement'),ru=document.querySelector('.ruler');if(!st||!ru)return;st.style.marginLeft='';
   if(innerWidth<=760)return;st.style.marginLeft=Math.max(0,Math.min(innerWidth*.4,(ru.getBoundingClientRect().left-parseFloat(getComputedStyle(st.parentElement).paddingLeft))*.6))+'px'};
 addEventListener('resize',alignTag);addEventListener('load',alignTag);alignTag();
+// on the home screen the timeline sits just left of the Studios / About links (desktop only)
+const placeRuler=()=>{const h=document.getElementById('hud'),m=h&&h.querySelector('.mid'),n=document.querySelector('.intro .nav');if(!m||!n)return;
+  if(innerWidth<=760){h.style.setProperty('--mx','0px');return}
+  const t=m.style.transform;m.style.transition='none';h.style.setProperty('--mx','0px');const r=m.getBoundingClientRect(),nl=n.getBoundingClientRect().left;
+  h.style.setProperty('--mx',Math.max(0,nl-32-r.right)+'px');m.offsetWidth;m.style.transition=''};
+addEventListener('resize',placeRuler);addEventListener('load',placeRuler);document.fonts&&document.fonts.ready.then(placeRuler);placeRuler();
 // nav links jump along the walk instead of to an anchor
 document.addEventListener('click',e=>{const a=e.target.closest('a[href="#studios"],a[href="#about"],a[href="#top"]');if(!a)return;e.preventDefault();
   const t=a.getAttribute('href');goTo(t==='#studios'?$('#studio-art'):t==='#about'?$('#about'):intro,false)});
