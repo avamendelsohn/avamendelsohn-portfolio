@@ -783,7 +783,7 @@ function gaitPose(rig,p,r,amp){
   // little later (WR_DELAY) the hand hangs WR_DROP x BEND below the forearm. Both rise and fall as sin^2, so they
   // start and end with no jolt and the wing is open again before the next downstroke. Nothing sweeps back: the
   // joints only bend up and down, and the hand keeps the outline's own small backward angle (6)
-  const ELB_DELAY=.035,HAND_DELAY=.06,HAND_K=18,BEND=12,ELB_DROP=1.2,WR_DROP=1,WR_DELAY=.12;
+  const ELB_DELAY=.05,HAND_DELAY=.06,HAND_K=24,BEND=20,ELB_DROP=1.2,WR_DROP=1,WR_DELAY=.12;
   const sin2=t=>t<=0||t>=1?0:Math.sin(Math.PI*t)**2;
   const flapPose=ph=>{const c=stroke(ph),u=ph-Math.floor(ph),t=u<DOWN?-1:(u-DOWN)/(1-DOWN);
     const fore=stroke(ph-ELB_DELAY),ee=SH_AMP*(fore-c),e2=-4+HAND_K*(stroke(ph-ELB_DELAY-HAND_DELAY)-fore);
@@ -976,7 +976,7 @@ function gaitPose(rig,p,r,amp){
     f.n=skein?Math.round(rnd(16,26)):Math.round(rnd(...f.count));f.birds=[];
     setShape(f,f.low||skein?'string':SHAPES[Math.floor(Math.random()*SHAPES.length)]);
     f.birds=f.slots.map((sl,i)=>({slot:i,size:rnd(.94,1.06),w:wings(i===0),alt:0,valt:0,fwd:0,pitch:0,
-      off:{b:sl.back,l:sl.lat,d:sl.drop},db:drift(1.5,3.5,.8),dl:drift(1.8,4,.7),dd:drift(1.8,4,.7),ge1:drift(5,12,.25),ge2:drift(5,12,.25),ge3:drift(6,14,.2),
+      off:{b:sl.back,l:sl.lat,d:sl.drop},db:drift(1.5,3.5,.8),dl:drift(1.8,4,.7),dd:drift(1.8,4,.7),ge1:drift(5,12,.25),ge2:drift(5,12,.25),ge3:drift(6,14,.2),rl:drift(3,7,.35),lean:{v:0,t:0,dur:0,wait:rnd(3,14)},
       // each bird's own glide: wings anywhere from a touch below level to a little above, a softer or stronger bend
       // at the wrist, a flatter or more swept hand; it wanders slowly around this (ge) and now and then one wing
       // makes a small correction (ax)
@@ -1098,7 +1098,12 @@ function gaitPose(rig,p,r,amp){
       if(b.hd===undefined){b.hd=hd;b.turn=0;b.bank=0}
       const dh=(hd-b.hd)*(1-Math.exp(-dt*2.5));b.hd+=dh;
       b.turn+=((dt>0?dh/dt:0)-b.turn)*(1-Math.exp(-dt*1.5));
-      const bankTg=DEBUG_BANK&&b===dbg.bird&&dbg.hold!==null?dbg.hold:BANK_MAX*Math.tanh(BANK_K*b.turn/BANK_MAX);
+      // on top of the turn: a slow rocking on the air (up to about 8 degrees either way) and, every so often, a
+      // deliberate lean of 15 to 32 degrees held for a couple of seconds and eased out again, as pelicans do when
+      // they adjust their line or peel off
+      const ln=b.lean;if(ln.dur>0){ln.t+=dt;if(ln.t>=ln.dur){ln.dur=0;ln.wait=rnd(8,20)}}else if((ln.wait-=dt)<=0){ln.t=0;ln.dur=rnd(2,4);ln.v=(Math.random()<.5?-1:1)*rnd(15,32)}
+      const leanNow=ln.dur>0?ln.v*Math.sin(Math.PI*ln.t/ln.dur)**2:0;
+      const bankTg=DEBUG_BANK&&b===dbg.bird&&dbg.hold!==null?dbg.hold:Math.max(-BANK_MAX,Math.min(BANK_MAX,BANK_MAX*Math.tanh(BANK_K*b.turn/BANK_MAX)+8*stepDrift(b.rl,dt)+leanNow));
       b.bank+=(bankTg-b.bank)*(1-Math.exp(-dt*(DEBUG_BANK&&b===dbg.bird&&dbg.hold!==null?4:1.2)));
       // the body rises a touch on each downstroke; the nose follows the bird's own climb or sink
       // the body is lifted by each downstroke and settles a touch on the recovery, a little behind the wings
