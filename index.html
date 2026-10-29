@@ -1038,7 +1038,9 @@ function gaitPose(rig,p,r,amp){
     f.C=[M[0]-dz/hl*bend*hl,M[1]+(hz?0:rnd(-.12,.12)*hl*.3),M[2]+dx/hl*bend*hl];
     f.D=(Math.hypot(dx,f.P1[1]-f.P0[1],dz)+Math.hypot(...f.C.map((c,i)=>c-f.P0[i]))+Math.hypot(...f.C.map((c,i)=>f.P1[i]-c)))/2;
     f.v=V*rnd(.9,1.1);f.flip=!left;
-    f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(18,32);layout(f);f.fan=0;f.fanTg=0;f.vt=0;if(kind==='horizon')for(const sl of f.slots)sl.drop*=.15;   // keep the horizon strings nearly level
+    f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(18,32);layout(f);f.fan=0;f.fanTg=0;f.vt=0;if(kind==='horizon')for(const sl of f.slots)sl.drop*=.15;
+    // low flocks over the water: nearly a straight line with only the slightest wave, and a little quicker
+    if(low){for(const sl of f.slots)sl.drop*=.2;f.v*=1.3}   // keep the horizon strings nearly level
     f.gl={t:0,dur:0,v:0,wait:rnd(6,16)};
   }
   // a point on the curved path (a quadratic curve through C), and the path's level direction there; past either
@@ -1084,13 +1086,13 @@ function gaitPose(rig,p,r,amp){
       if(!lead&&bySlot[sl.ahead].w.started&&!b.w.flap&&b.w.cue<0&&b.w.since>1.5&&Math.random()<.7)b.w.cue=rnd(.25,.6);
       // flapping lifts and pushes forward, gliding settles and eases back; springs keep the bird near its slot
       const fl=1-b.w.g;
-      b.valt+=((fl*-11+(1-fl)*(f.low?.6:2.2)-b.alt*.12)-b.valt)*(1-Math.exp(-dt*.6));b.alt+=b.valt*dt;
+      b.valt+=((fl*(f.low?-4:-11)+(1-fl)*(f.low?.6:2.2)-b.alt*.12)-b.valt)*(1-Math.exp(-dt*.6));b.alt+=b.valt*dt;
       b.fwd+=((lead?-6:-40)*fl-b.fwd)*(1-Math.exp(-dt*.5));
       // the formation never sets: gliding or flapping, every bird keeps drifting around its slot on the wind
       // the big reshuffles happen while flapping: each new bout picks fresh targets for this bird and its gap, and it
       // moves to them quickly under power; in a glide it only eases slowly
       if(b.w.started){b.db.tt=b.dl.tt=b.dd.tt=0;f.gaps[b.slot].tt=0}
-      const k=lead?.5:1,e=1-Math.exp(-dt*lerp(1.8,.25,b.w.g)),tg=T[b.slot];
+      const k=(lead?.5:1)*(f.low?.3:1),e=1-Math.exp(-dt*lerp(1.8,.25,b.w.g)),tg=T[b.slot];
       b.off.b+=(tg.b+40*stepDrift(b.db,dt)*k-b.off.b)*e;
       b.off.l+=(tg.l+50*stepDrift(b.dl,dt)*k-b.off.l)*e;
       b.off.d+=(tg.d+28*stepDrift(b.dd,dt)*k-b.off.d)*e;
