@@ -919,7 +919,7 @@ function gaitPose(rig,p,r,amp){
   // bank in degrees per radian/second of turn, and its limit. The turns here are gentle (about 1.3 degrees a second
   // on a curved pass), so the bank is scaled up past strict physics to read at this size. It eases toward BANK_MAX:
   // about 9 degrees on a gentle curve, 12-17 on a typical one, close to 20 on the tightest, nothing on a straight one
-  const BANK_K=380,BANK_MAX=40,GL_DELAY=.35,FAN=120;
+  const BANK_K=380,BANK_MAX=40,GL_DELAY=.35,FAN=120,HD_MAX=45*D;
   // development only: add ?debugbank to the page address (or set true) to pick the largest pelican, label its
   // heading and bank, and hold it with keys 1 (-20), 2 (0), 3 (+20) or let it bank on its own with 4
   const DEBUG_BANK=false||/[?&]debugbank\b/.test(location.search);
@@ -1034,13 +1034,15 @@ function gaitPose(rig,p,r,amp){
     // a path pointed too straight at (or away from) the viewer stacks the formation into a column: pick again
     if(Math.abs(dx)<Math.abs(dz)*1.1&&tries<12)return launch(f,tries+1);
     // most paths curve: the middle of the path bows sideways (a gentle turn) and a little up or down
-    const hz=kind==='horizon',bend=hz?rnd(-.06,.06):Math.random()<.75?rnd(-.3,.3):0,M=[0,1,2].map(i=>(f.P0[i]+f.P1[i])/2);   // the horizon strings stay nearly straight and level
+    const hz=kind==='horizon'||low,bend=hz?rnd(-.06,.06):Math.random()<.75?rnd(-.3,.3):0,M=[0,1,2].map(i=>(f.P0[i]+f.P1[i])/2);   // the horizon strings stay nearly straight and level
     f.C=[M[0]-dz/hl*bend*hl,M[1]+(hz?0:rnd(-.12,.12)*hl*.3),M[2]+dx/hl*bend*hl];
     f.D=(Math.hypot(dx,f.P1[1]-f.P0[1],dz)+Math.hypot(...f.C.map((c,i)=>c-f.P0[i]))+Math.hypot(...f.C.map((c,i)=>f.P1[i]-c)))/2;
     f.v=V*rnd(.9,1.1);f.flip=!left;
     f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(18,32);layout(f);f.fan=0;f.fanTg=0;f.vt=0;if(kind==='horizon')for(const sl of f.slots)sl.drop*=.15;
     // low flocks over the water: nearly a straight line with only the slightest wave, and a little quicker
-    if(low){for(const sl of f.slots)sl.drop*=.2;f.v*=1.3}   // keep the horizon strings nearly level
+    if(low){const step=rnd(165,190),lean=rnd(4,8)*D*(Math.random()<.5?1:-1);
+      f.slots=f.slots.map((_,i)=>i?{back:i*step,lat:i*step*Math.tan(lean),drop:0,ahead:i-1,arm:1,rank:i}:{back:0,lat:0,drop:0,ahead:-1});
+      f.gaps=f.slots.map(()=>drift(2,5,.6));f.flat=0;f.v*=1.6}   // keep the horizon strings nearly level
     f.gl={t:0,dur:0,v:0,wait:rnd(6,16)};
   }
   // a point on the curved path (a quadratic curve through C), and the path's level direction there; past either
@@ -1071,7 +1073,7 @@ function gaitPose(rig,p,r,amp){
     // where each slot sits right now: every gap along an arm is its own length times a factor wandering
     // between about 0.55 and 1.45, so neighbours are always closing up or falling back
     const mo=1-f.flat*Math.min(1,f.t/40)+.2*stepDrift(f.morph,dt),T=[{b:0,l:0,d:0}];
-    for(let i=1;i<f.slots.length;i++){const sl=f.slots[i],a=f.slots[sl.ahead],t=T[sl.ahead],g=1+.5*stepDrift(f.gaps[i],dt*(f.birds.find(q=>q.slot===i)?.w.g<.5?2.2:.6));
+    for(let i=1;i<f.slots.length;i++){const sl=f.slots[i],a=f.slots[sl.ahead],t=T[sl.ahead],g=1+(f.low?.12:.5)*stepDrift(f.gaps[i],dt*(f.birds.find(q=>q.slot===i)?.w.g<.5?2.2:.6));
       T[i]={b:t.b+(sl.back-a.back)*g,l:t.l+(sl.lat-a.lat)*g*mo,d:t.d+(sl.drop-a.drop)*g*mo}}
     const fade=f.kind==='approach'?Math.min(1,u*5):f.kind==='recede'?Math.min(1,Math.max(0,(1-u)*5)):1;
     let visible=false;
@@ -1110,7 +1112,9 @@ function gaitPose(rig,p,r,amp){
       // heading: the bird faces along the path (its level direction tx,tz), eased so it turns smoothly. Seen from the
       // side, a bird angled toward or away from us looks shorter and its wings swing out across the view; the rate the
       // heading turns sets a gentle bank, into the turn (the inside wing dips), levelling out again on the straight
-      const hd=Math.atan2(tz,Math.abs(tx));
+      // never seen straight from the front or back: the heading is held within 45 degrees of side-on, even where
+      // the path itself turns toward or away from the viewer
+      const hd=clamp(Math.atan2(tz,Math.abs(tx)),-HD_MAX,HD_MAX);
       if(b.hd===undefined){b.hd=hd;b.turn=0;b.bank=0}
       const dh=(hd-b.hd)*(1-Math.exp(-dt*2.5));b.hd+=dh;
       b.turn+=((dt>0?dh/dt:0)-b.turn)*(1-Math.exp(-dt*1.5));
