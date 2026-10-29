@@ -81,7 +81,7 @@ button{font:inherit;color:inherit}
 /* name, ruler and nav all sit on one 24px line at the top, in the intro and in every room */
 /* ---------- the walk: a tall page whose vertical scroll slides a long rail of rooms sideways ---------- */
 .walk{position:relative}
-.stage{position:sticky;top:0;height:100svh;height:100dvh;overflow:hidden}  /* dvh follows the phone browser bar as it hides, so no gap opens at the bottom */
+.stage{position:sticky;top:0;height:100svh;height:100lvh;overflow:hidden}  /* lvh = the screen with the phone browser bar hidden, so no gap opens when it hides; --bar keeps bottom content above the bar while it shows */
 .rail{display:flex;height:100%;width:max-content;will-change:transform}
 .hud{position:absolute;inset:0 0 auto;z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:16px;padding:calc(22px + env(safe-area-inset-top,0px)) var(--gxr) 0 var(--gx);color:#fff;mix-blend-mode:difference;pointer-events:none;font:600 17px/24px var(--display)}
 .hud>*{pointer-events:auto}
@@ -315,6 +315,13 @@ body{font-family:"Asap",system-ui,sans-serif}
 .hud:not(.out) .mid{opacity:0;pointer-events:none}
 /* phones: tall screens stretch the sky, so the warm orange starts higher up (water stops unchanged) */
 @media (max-aspect-ratio:4/5){.intro{background:linear-gradient(180deg,#f0d2ac 0%,#f9cd96 11%,#ffc07c 24%,#fdae69 38%,#f99f5e 52%,#f6925a 64%,#f88a4f 74%,#fa8648 81%,#fc8a40 85.9%,#e1814e 86.1%,#bf7b5e 88.5%,#95746f 91.5%,#6c616a 95.5%,#56535c 100%)}}
+/* phones: the stage is as tall as the screen with the browser bar hidden; lift the bottom content by the bar's height */
+:root{--bar:0px}
+@supports (height:100lvh){:root{--bar:calc(100lvh - 100svh)}}
+.intro{padding-bottom:calc(22px + var(--bar))}
+.walker{bottom:calc(17px + env(safe-area-inset-bottom,0px) + var(--bar))!important}
+.room{padding-bottom:var(--bar)}
+.about .abc{bottom:calc(22px + var(--bar))}.room.about{padding-bottom:calc(96px + var(--bar))!important}
 /* contact links and the walker on the water in sunset peach */
 .contact{color:#f0c4a0!important;text-shadow:none!important}
 .walker.light.sea:not(.up){color:#f0c4a0}
@@ -437,7 +444,7 @@ const PROJECTS=[
   role:"Partner project. We split all responsibilities and collaborated with our sponsor, the founder of WeShareCare.",
   skills:["Project schedule","Questionnaire","Interviews","Stakeholder analysis","Competitor analysis","User study","UI design"],
   more:["We addressed language translation issues, investigated which telehealth features matter most to users, and applied UI design principles to reformat the app, including the badly broken question feature and the inability to view previous chats or reach previous providers.","Research included a questionnaire on patients' telehealth experiences, interviews with healthcare professionals, stakeholder and competitor analysis, and an in-context user study, all feeding the redesigned patient and provider interfaces."]},
- {id:"zoox",title:"ZOOX",kind:"UI · In-car interface",for:"Interface for",bg:"var(--violet)",fg:"var(--paper)",x:27,y:640,w:290,r:-4,cover:23,ar:"3/2",cbg:"#06021a",
+ {id:"zoox",hidden:true,title:"ZOOX",kind:"UI · In-car interface",for:"Interface for",bg:"var(--violet)",fg:"var(--paper)",x:27,y:640,w:290,r:-4,cover:23,ar:"3/2",cbg:"#06021a",
   blurb:"A seat-back tablet for riding in an autonomous ZOOX: climate, music, route, and an emergency button.",
   intro:"ZOOX provides on-demand autonomous ride-hailing. It already had a strong brand and website, so we designed the in-car experience: tablets in the seat backs that let riders control the car and personalize the ride.",
   challenge:"Create an in-car interface that matches ZOOX's existing visual language and makes riding in a driverless car feel calm and in control.",
@@ -511,7 +518,7 @@ const STUDIOS=[
  {id:'photo',name:'Photography',blurb:'A selection of my photography.',
   pieces:{p:'photo',k:[8,19,10,47,3,13]},hang:[[46,-2],[54,4],[50,-7],[40,6]]},
  {id:'ux',name:'UX design',blurb:'BS in Human Factors Engineering: systems design, research, interaction design and testing.',
-  slides:['autodesk','wesharecare','zoox','hobbees']},
+  slides:['autodesk','wesharecare','hobbees']},
  {id:'personal',name:'Personal projects',blurb:'Product design and fabrication.',
   slides:['furniture','bike']},
  {id:'arch',name:'Architecture',blurb:'Studio projects in architectural design.',
@@ -554,7 +561,7 @@ function placeWalker(){
   wStart=Math.min(innerWidth*.7,Math.max(innerWidth*.22,c.right+X0()+24));wEnd=innerWidth-gut-walker.offsetWidth;
   wEndX=Math.max(1,od.offsetLeft+od.offsetWidth-innerWidth);
 }
-function layout(){placeWalker();maxX=Math.max(0,rail.scrollWidth-innerWidth);walk.style.height=maxX+innerHeight+'px';stops.forEach(s=>{const r=s.el.getBoundingClientRect();s.x=r.left+X0()+(s.start?0:r.width/2-innerWidth/2)});update(true)}
+function layout(){placeWalker();maxX=Math.max(0,rail.scrollWidth-innerWidth);walk.style.height=maxX+Math.max(innerHeight,walk.firstElementChild.offsetHeight)+'px';stops.forEach(s=>{const r=s.el.getBoundingClientRect();s.x=r.left+X0()+(s.start?0:r.width/2-innerWidth/2)});update(true)}
 const X0=()=>Math.max(0,X);
 const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
 function update(force){
