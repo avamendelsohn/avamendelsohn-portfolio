@@ -827,7 +827,8 @@ function gaitPose(rig,p,r,amp){
     const h=d.haze;ctx.fillStyle=`rgb(${Math.round(23+177*h)},${Math.round(19+131*h)},${Math.round(27+103*h)})`;
     // the bank is a roll of the whole bird about its long axis (see proj); positive lifts the near wing
     HK=d.hk;HYAW=d.hz;RC=Math.cos(d.bank*D);RS=Math.sin(d.bank*D);
-    const p=d.p;wing(p.e1-4,p.e2,p.sw,-1,16,-9,1.2);body();wing(p.e1,p.e2,p.sw,1,8,-6,1.28);
+    const p=d.p,q=d.asym,fa=q&&q.side<0?q:{e1:0,e2:0},na=q&&q.side>0?q:{e1:0,e2:0};
+    wing(p.e1-4+fa.e1,p.e2+fa.e2,p.sw,-1,16,-9,1.2);body();wing(p.e1+na.e1,p.e2+na.e2,p.sw,1,8,-6,1.28);
   }
 
   // ---- the birds fly in a 3D airspace, seen as if from a cliff above the water. Every bird has a world position
@@ -856,6 +857,9 @@ function gaitPose(rig,p,r,amp){
   // heading and bank, and hold it with keys 1 (-20), 2 (0), 3 (+20) or let it bank on its own with 4
   const DEBUG_BANK=false||/[?&]debugbank\b/.test(location.search);
   const dbg={bird:null,hold:null,d:null};
+  // development only: ?debugglide draws the six nearest birds of the nearest flock side by side, large and level,
+  // with their live wing poses and bank, to compare glide postures
+  const DEBUG_GLIDE=false||/[?&]debugglide\b/.test(location.search);
   if(DEBUG_BANK)addEventListener('keydown',e=>{const v={'1':-20,'2':0,'3':20,'4':null}[e.key];if(v!==undefined)dbg.hold=v});                      // depth range in bird units (a bird is ~135 long); flight speed
   const toWorld=(x,y,Z)=>[(x-CX)*Z/F,(y-CY)*Z/F,Z];
 
@@ -908,7 +912,11 @@ function gaitPose(rig,p,r,amp){
     f.n=skein?Math.round(rnd(16,26)):Math.round(rnd(...f.count));f.birds=[];
     setShape(f,f.low||skein?'string':SHAPES[Math.floor(Math.random()*SHAPES.length)]);
     f.birds=f.slots.map((sl,i)=>({slot:i,size:rnd(.94,1.06),w:wings(i===0),alt:0,valt:0,fwd:0,pitch:0,
-      off:{b:sl.back,l:sl.lat,d:sl.drop},db:drift(1.5,3.5,.8),dl:drift(1.8,4,.7),dd:drift(1.8,4,.7),ge1:drift(4,9,.3),ge2:drift(4,9,.3)}));   // ge: a slow, slight change in the glide pose
+      off:{b:sl.back,l:sl.lat,d:sl.drop},db:drift(1.5,3.5,.8),dl:drift(1.8,4,.7),dd:drift(1.8,4,.7),ge1:drift(5,12,.25),ge2:drift(5,12,.25),ge3:drift(6,14,.2),
+      // each bird's own glide: wings anywhere from a touch below level to a little above, a softer or stronger bend
+      // at the wrist, a flatter or more swept hand; it wanders slowly around this (ge) and now and then one wing
+      // makes a small correction (ax)
+      gp:{e1:rnd(-2,9),e2:rnd(-13,-5),sw:rnd(4,10)},ax:{t:0,dur:0,wait:rnd(3,12),side:1,de1:0,de2:0}}));
     f.reshape=rnd(14,26);
   }
   // mid-flight the flock can fly into a V and later stretch back out of it into a line or string. New slots are
@@ -927,6 +935,15 @@ function gaitPose(rig,p,r,amp){
       b.slot=arms[k][used[k]++];
     });
   }
+  // an occasional one-wing correction while gliding: one wing lifts or lowers a few degrees and its wrist bends a
+  // touch, easing in and back out over 1.5-3 s, then nothing for 6-16 s (sooner while the bird is turning). It
+  // fades out under flapping, so the wingbeat stays symmetric
+  function stepAsym(b,dt){const a=b.ax;
+    if(a.dur>0){a.t+=dt;if(a.t>=a.dur){a.dur=0;a.wait=rnd(6,16)}}
+    else if((a.wait-=dt*(Math.abs(b.bank)>6?2:1))<=0&&b.w.g>.9){a.t=0;a.dur=rnd(1.5,3);a.side=Math.random()<.5?1:-1;
+      a.de1=(Math.random()<.5?1:-1)*rnd(2,4);a.de2=rnd(-3,3)}
+    const k=a.dur>0?Math.pow(Math.sin(Math.PI*a.t/a.dur),2)*b.w.g:0;
+    return {side:a.side,e1:k*a.de1,e2:k*a.de2}}
   function makeFlock(o){return {...o,birds:[],slots:[],t:0,wait:rnd(...o.firstWait)}}
   function launch(f,tries=0){
     const kind=f.kinds[Math.floor(Math.random()*f.kinds.length)],left=Math.random()<.65,low=kind!=='far'&&kind!=='skein'&&Math.random()<f.lowChance;
@@ -1025,7 +1042,7 @@ function gaitPose(rig,p,r,amp){
       b.pitch+=(Math.max(-.08,Math.min(.08,-b.valt/60))-b.pitch)*(1-Math.exp(-dt*1.4));
       const near=Math.min(1,Math.max(0,(ZFAR-Z)/(ZFAR-ZNEAR)));b.sx=x;b.sy=y;b.ss=s;b.sc=sc;
       if(x>-300&&x<W+300&&fade>0){visible=true;
-        out.push({bird:b,Z,x,y:y+bob,s,hk:Math.cos(b.hd),hz:Math.sin(b.hd),bank:b.bank,p:pose(b.w.ph,b.w.amp,{e1:GLIDE.e1+1.2*stepDrift(b.ge1,dt),e2:GLIDE.e2+2*stepDrift(b.ge2,dt),sw:GLIDE.sw}),pitch:b.pitch,flip:f.flip,alpha:fade*(.5+.45*near),haze:(1-near)*.55})}
+        out.push({bird:b,Z,x,y:y+bob,s,hk:Math.cos(b.hd),hz:Math.sin(b.hd),bank:b.bank,p:pose(b.w.ph,b.w.amp,{e1:b.gp.e1+2*stepDrift(b.ge1,dt),e2:b.gp.e2+2.5*stepDrift(b.ge2,dt),sw:b.gp.sw+1.5*stepDrift(b.ge3,dt)}),asym:stepAsym(b,dt),pitch:b.pitch,flip:f.flip,alpha:fade*(.5+.45*near),haze:(1-near)*.55})}
     }
     // a brief overlap is fine; after about a second the bird further back drifts up or down out of the stack
     for(const b of f.birds)b.hit=null;
@@ -1092,6 +1109,7 @@ function gaitPose(rig,p,r,amp){
     drawList.length=0;for(const f of flocks)stepFlock(f,dt,drawList);
     drawList.sort((p,q)=>q.Z-p.Z);for(const d of drawList)drawBird(d);
     if(DEBUG_BANK)debugBank();
+    if(DEBUG_GLIDE)debugGlide();
     raf=on?requestAnimationFrame(frame):0;
   }
   // keeps following the same bird while it's on screen, then picks the largest one again
@@ -1103,6 +1121,13 @@ function gaitPose(rig,p,r,amp){
     if(!d)return;const b=d.bird;
     ctx.strokeStyle='#1d1a16';ctx.lineWidth=1;ctx.beginPath();ctx.arc(d.x,d.y,90*d.s,0,TAU);ctx.stroke();
     ctx.fillText(`heading ${(b.hd/D).toFixed(1)}°  bank ${b.bank>=0?'+':''}${b.bank.toFixed(1)}°  ${dbg.hold===null?'live':'held '+dbg.hold}  ${d.flip?'flying right':'flying left'}`,d.x-90*d.s,d.y-90*d.s-8);
+  }
+  function debugGlide(){
+    const ds=drawList.slice().sort((p,q)=>q.s-p.s).slice(0,6);
+    ds.forEach((d,i)=>{const b=d.bird;
+      drawBird({...d,x:W*(.1+.15*i),y:H*.58,s:Math.min(1.1,W/1100),hk:1,hz:0,alpha:1,haze:0,pitch:0,flip:false});
+      ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#1d1a16';ctx.font='11px ui-monospace,monospace';
+      ctx.fillText(`e1 ${d.p.e1.toFixed(1)} e2 ${d.p.e2.toFixed(1)} bank ${b.bank.toFixed(1)}${d.asym&&Math.abs(d.asym.e1)>.2?' adj':''}`,W*(.1+.15*i)-70,H*.58+80)});
   }
   const resume=()=>{if(on&&!raf&&!document.hidden){last=0;raf=requestAnimationFrame(frame)}};
   new IntersectionObserver(([e])=>{on=e.isIntersecting;resume()}).observe(intro);
