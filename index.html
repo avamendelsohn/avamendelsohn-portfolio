@@ -1093,7 +1093,7 @@ function gaitPose(rig,p,r,amp){
       const back=b.off.b+b.fwd,[P,tx,tz]=pathAt(f,u-back/f.D);
       // birds that have sat on top of each other for more than a moment ease apart (see the end of stepFlock)
       if(b.sep===undefined){b.sep=0;b.sepTg=0;b.ov=0}
-      b.sepTg*=Math.exp(-dt/14);b.sep+=(b.sepTg-b.sep)*(1-Math.exp(-dt*.9));
+      b.sepTg*=Math.exp(-dt/(b.hit?60:14));b.sep+=(b.sepTg-b.sep)*(1-Math.exp(-dt*1.6));
       const X=P[0]-tz*b.off.l,Z=Math.max(400,P[2]+tx*b.off.l),Yd=P[1]+air+b.off.d+b.alt+b.sep;
       const sc=F/Z,x=CX+X*sc,y=CY+Yd*sc,s=sc*b.size;
       // heading: the bird faces along the path (its level direction tx,tz), eased so it turns smoothly. Seen from the
@@ -1121,15 +1121,19 @@ function gaitPose(rig,p,r,amp){
     }
     // a brief overlap is fine; after about a second the bird further back drifts up or down out of the stack
     for(const b of f.birds)b.hit=null;
+    // two birds count as stacked when their bodies and wings cover each other on screen (about a body length apart
+    // across and a wing's height up and down). The bird further back keeps moving up or down, away from the other,
+    // for as long as they stay stacked, and faster the longer it lasts, so a stack clears within a second or two
     for(let i=0;i<f.birds.length;i++)for(let j=i+1;j<f.birds.length;j++){const p=f.birds[i],q=f.birds[j],m=Math.max(p.ss,q.ss);
-      if(Math.abs(p.sx-q.sx)<50*m&&Math.abs(p.sy-q.sy)<16*m){const back=p.slot>q.slot?p:q;back.hit=back===p?q:p}}
+      if(Math.abs(p.sx-q.sx)<85*m&&Math.abs(p.sy-q.sy)<26*m){const back=p.slot>q.slot?p:q;back.hit=back===p?q:p}}
     for(const b of f.birds){if(!b.hit){b.ov=Math.max(0,b.ov-dt*2);continue}
-      if((b.ov+=dt)>.8){const o=b.hit,dir=b.sy===o.sy?(Math.random()<.5?-1:1):Math.sign(b.sy-o.sy);b.sepTg+=dir*30*dt/(b.sc||1)*2;b.ov=.8}}
+      if((b.ov+=dt)>.6){const o=b.hit;if(!b.sepDir||b.ov<.62)b.sepDir=Math.abs(b.sy-o.sy)<1?(Math.random()<.5?-1:1):Math.sign(b.sy-o.sy);
+        b.sepTg+=b.sepDir*(60+60*Math.min(2,b.ov-.6))*dt/(b.sc||1);b.ov=Math.min(b.ov,3)}}
     if(u>1&&!visible||u>1.8)f.wait=rnd(...f.rewait);
   }
   const flocks=[
-    makeFlock({count:[6,10],kinds:['approach','approach','recede','cross'],lowChance:.4,firstWait:[0,0],rewait:[4,9]}),
-    makeFlock({count:[5,9],kinds:['approach','recede','cross','far'],lowChance:.25,firstWait:[5,9],rewait:[8,16]}),
+    makeFlock({count:[6,10],kinds:['approach','approach','recede','cross'],lowChance:.55,firstWait:[0,0],rewait:[4,9]}),
+    makeFlock({count:[5,9],kinds:['approach','recede','cross','far'],lowChance:.4,firstWait:[5,9],rewait:[8,16]}),
     // a distant flock that stays far out, for depth
     makeFlock({count:[6,12],kinds:['far','far','skein'],lowChance:0,firstWait:[2,4],rewait:[10,20]})
   ];
