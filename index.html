@@ -454,8 +454,8 @@ const PROJECTS=[
   blurb:"Layouts for a student art and literary magazine and the school paper.",
   intro:"Work from a student art and literary magazine and a school newspaper: layout done mainly in Adobe InDesign, some of my physical artwork, plus logos and digital graphics.",skills:["InDesign","Editorial layout","Logos","Digital content"]},
  {id:"photo",title:"Photography",gscale:1.4,kind:"Personal",for:"",bg:"var(--ink)",fg:"var(--paper)",x:55,y:1560,w:230,r:3.5,cover:0,ar:"4/5",
-  blurb:"A selection of my photography. Open to commissions and collaborations.",
-  intro:"A selection of my photography. I’m open to commissions and collaborations, so get in touch at avacmendelsohn@gmail.com.",skills:[]},
+  blurb:"A selection of my photography.",
+  intro:"A selection of my photography.",skills:[]},
 ].filter(p=>!p.hidden); // hidden projects stay in the source but leave the site
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -471,7 +471,7 @@ Object.assign(byId('wesharecare'),fromPreview('wesharecare-study'));
 const STUDIOS=[
  {id:'art',name:'Artwork',blurb:'BFA in studio art: painting, printmaking, drawing and woodworking.',
   pieces:{p:'art',k:[0,2,3,8,16,18,1,7,25]},hang:[[56,0],[42,-9],[50,7],[38,-6],[56,0],[42,-9],[50,7],[48,-4],[40,4]]},
- {id:'photo',name:'Photography',blurb:'A selection of my photography. Open to commissions and collaborations.',
+ {id:'photo',name:'Photography',blurb:'A selection of my photography.',
   pieces:{p:'photo',k:[8,19,10,47,3,13]},hang:[[46,-2],[54,4],[50,-7],[40,6]]},
  {id:'ux',name:'UX design',blurb:'BS in Human Factors Engineering: systems design, research, interaction design and testing.',
   slides:['autodesk','wesharecare','zoox','hobbees']},
