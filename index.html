@@ -313,6 +313,8 @@ body{font-family:"Asap",system-ui,sans-serif}
 .intro .nav{color:#1f5fd1}  /* name colour: was #c2501d */
 .hud .mid{transition:opacity .3s ease}
 .hud:not(.out) .mid{opacity:0;pointer-events:none}
+/* phones: tall screens stretch the sky, so the warm orange starts higher up (water stops unchanged) */
+@media (max-aspect-ratio:4/5){.intro{background:linear-gradient(180deg,#f0d2ac 0%,#f9cd96 11%,#ffc07c 24%,#fdae69 38%,#f99f5e 52%,#f6925a 64%,#f88a4f 74%,#fa8648 81%,#fc8a40 85.9%,#e1814e 86.1%,#bf7b5e 88.5%,#95746f 91.5%,#6c616a 95.5%,#56535c 100%)}}
 /* contact links and the walker on the water in sunset peach */
 .contact{color:#f0c4a0!important;text-shadow:none!important}
 .walker.light.sea:not(.up){color:#f0c4a0}
