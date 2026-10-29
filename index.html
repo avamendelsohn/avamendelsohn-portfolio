@@ -913,8 +913,14 @@ function gaitPose(rig,p,r,amp){
     const nearY=()=>H*(low?rnd(.66,.72):rnd(.38,.6)),farY=()=>H*rnd(.16,.3);
     if(kind==='approach'){a=[inside(),farY(),rnd(9000,ZFAR)];b=[edgeOut,nearY(),rnd(ZNEAR,3200)]}
     else if(kind==='recede'){a=[edgeIn,nearY(),rnd(ZNEAR,3200)];b=[inside(),farY(),rnd(9000,ZFAR)]}
-    else{const Z=kind==='skein'?rnd(10000,13500):kind==='far'?rnd(8000,13000):rnd(3500,9000),Z2=Z*rnd(.8,1.2),y=H*(low?rnd(.68,.74):rnd(.2,.5));
-      a=[edgeIn,y,Z];b=[edgeOut,y+H*rnd(-.06,.06),Z2]}
+    else{const Z=kind==='skein'?rnd(10000,13500):kind==='far'?rnd(8000,13000):rnd(3500,9000),y=H*(low?rnd(.68,.74):rnd(.2,.5));
+      // far birds cross at about one depth; nearer crossings drift clearly toward or away from the viewer on the way
+      // across, so they visibly grow or shrink (the closer they start, the bigger the change)
+      const near=kind!=='skein'&&kind!=='far'&&Z<7000,Z2=near?Math.min(11000,Math.max(ZNEAR,Z*(Math.random()<.5?rnd(.5,.68):rnd(1.5,2)))):Z*rnd(.8,1.2);
+      // at a steady height a bird that pulls away rises toward the horizon on screen and one that comes in drops (half
+      // the true shift, so the pass still reads as a crossing); low birds stay down over the water
+      const y2=low?y+H*rnd(-.03,.03):y+((CY+(y-CY)*Z/Z2)-y)*.5+H*rnd(-.04,.04);
+      a=[edgeIn,y,Z];b=[edgeOut,y2,Z2]}
     f.P0=toWorld(...a);f.P1=toWorld(...b);f.kind=kind;f.low=low;
     const dx=f.P1[0]-f.P0[0],dz=f.P1[2]-f.P0[2],hl=Math.hypot(dx,dz);
     // a path pointed too straight at (or away from) the viewer stacks the formation into a column: pick again
