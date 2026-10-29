@@ -313,7 +313,7 @@ body{font-family:"Asap",system-ui,sans-serif}
 .intro header{align-items:center}
 .intro header .name{margin-top:clamp(6px,2vh,24px)!important;white-space:nowrap}
 .intro header .name{transition:color .2s ease}.intro header .name:hover{color:#aa8898}
-.intro .nav a{transition:color .2s ease}.intro .nav a:hover{color:#aa8898}   /* a light blue-green on hover */
+.intro .nav a{transition:color .2s ease}.intro .nav a:hover{color:#aa8898;text-decoration:none}
 .intro .nav{color:#1f5fd1}  /* name colour: was #c2501d */
 .hud .mid{transition:opacity .3s ease}
 .hud:not(.out) .mid{opacity:0;pointer-events:none}
@@ -1014,7 +1014,7 @@ function gaitPose(rig,p,r,amp){
     return {side:a.side,e1:k*a.de1,e2:k*a.de2}}
   function makeFlock(o){return {...o,birds:[],slots:[],t:0,wait:rnd(...o.firstWait)}}
   function launch(f,tries=0){
-    const kind=f.kinds[Math.floor(Math.random()*f.kinds.length)],left=Math.random()<.65,low=kind!=='far'&&kind!=='skein'&&kind!=='horizon'&&Math.random()<f.lowChance;
+    const kind=f.kinds[Math.floor(Math.random()*f.kinds.length)],left=Math.random()<.65,low=kind==='cross'&&Math.random()<f.lowChance*2;
     const off=left?-1:1,edgeIn=left?W+80:-80,edgeOut=left?-80:W+80,inside=()=>W*(left?rnd(.7,1):rnd(0,.3));
     let a,b;   // [screen x, screen y, Z] at the start and end of the pass
     const nearY=()=>H*(low?rnd(.66,.72):rnd(.38,.6)),farY=()=>H*rnd(.16,.3);
@@ -1039,11 +1039,13 @@ function gaitPose(rig,p,r,amp){
     f.C=[M[0]-dz/hl*bend*hl,M[1]+(hz?0:rnd(-.12,.12)*hl*.3),M[2]+dx/hl*bend*hl];
     f.D=(Math.hypot(dx,f.P1[1]-f.P0[1],dz)+Math.hypot(...f.C.map((c,i)=>c-f.P0[i]))+Math.hypot(...f.C.map((c,i)=>f.P1[i]-c)))/2;
     f.v=V*rnd(.9,1.1);f.flip=!left;
-    f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(18,32);layout(f);f.fan=0;f.fanTg=0;f.vt=0;if(kind==='horizon')for(const sl of f.slots)sl.drop*=.15;
+    f.u=0;f.t=0;f.gust=drift(2.5,6,.5);f.air=drift(3,8,.4);f.morph=drift(4,9,.3);f.spread=drift(5,10,.3);f.swap=rnd(18,32);layout(f);f.fan=0;f.fanTg=0;f.vt=0;
     // low flocks over the water: nearly a straight line with only the slightest wave, and a little quicker
-    if(low){const step=rnd(165,190),lean=rnd(4,8)*D*(Math.random()<.5?1:-1);
-      f.slots=f.slots.map((_,i)=>i?{back:i*step,lat:i*step*Math.tan(lean),drop:0,ahead:i-1,arm:1,rank:i}:{back:0,lat:0,drop:0,ahead:-1});
-      f.gaps=f.slots.map(()=>drift(2,5,.6));f.flat=0;f.v*=1.6}   // keep the horizon strings nearly level
+    // low flocks over the water and the horizon strings fly as one straight line along the path, every bird at the
+    // same distance from the viewer, so the line can't climb or drop away on screen as it trails back
+    if(low||kind==='horizon'){const step=kind==='horizon'?rnd(190,230):rnd(165,190);
+      f.slots=f.slots.map((_,i)=>i?{back:i*step,lat:0,drop:0,ahead:i-1,arm:1,rank:i}:{back:0,lat:0,drop:0,ahead:-1});
+      f.gaps=f.slots.map(()=>drift(2,5,.6));f.flat=0;if(low)f.v*=1.6}   // keep the horizon strings nearly level
     f.gl={t:0,dur:0,v:0,wait:rnd(6,16)};
   }
   // a point on the curved path (a quadratic curve through C), and the path's level direction there; past either
@@ -1074,7 +1076,7 @@ function gaitPose(rig,p,r,amp){
     // where each slot sits right now: every gap along an arm is its own length times a factor wandering
     // between about 0.55 and 1.45, so neighbours are always closing up or falling back
     const mo=1-f.flat*Math.min(1,f.t/40)+.2*stepDrift(f.morph,dt),T=[{b:0,l:0,d:0}];
-    for(let i=1;i<f.slots.length;i++){const sl=f.slots[i],a=f.slots[sl.ahead],t=T[sl.ahead],g=1+(f.low?.12:.5)*stepDrift(f.gaps[i],dt*(f.birds.find(q=>q.slot===i)?.w.g<.5?2.2:.6));
+    for(let i=1;i<f.slots.length;i++){const sl=f.slots[i],a=f.slots[sl.ahead],t=T[sl.ahead],g=1+(f.low||f.kind==='horizon'?.12:.5)*stepDrift(f.gaps[i],dt*(f.birds.find(q=>q.slot===i)?.w.g<.5?2.2:.6));
       T[i]={b:t.b+(sl.back-a.back)*g,l:t.l+(sl.lat-a.lat)*g*mo,d:t.d+(sl.drop-a.drop)*g*mo}}
     const fade=f.kind==='approach'?Math.min(1,u*5):f.kind==='recede'?Math.min(1,Math.max(0,(1-u)*5)):1;
     let visible=false;
@@ -1095,7 +1097,7 @@ function gaitPose(rig,p,r,amp){
       // the big reshuffles happen while flapping: each new bout picks fresh targets for this bird and its gap, and it
       // moves to them quickly under power; in a glide it only eases slowly
       if(b.w.started){b.db.tt=b.dl.tt=b.dd.tt=0;f.gaps[b.slot].tt=0}
-      const k=(lead?.5:1)*(f.low?.3:1),e=1-Math.exp(-dt*lerp(1.8,.25,b.w.g)),tg=T[b.slot];
+      const k=(lead?.5:1)*(f.low||f.kind==='horizon'?.25:1),e=1-Math.exp(-dt*lerp(1.8,.25,b.w.g)),tg=T[b.slot];
       b.off.b+=(tg.b+40*stepDrift(b.db,dt)*k-b.off.b)*e;
       b.off.l+=(tg.l+50*stepDrift(b.dl,dt)*k-b.off.l)*e;
       b.off.d+=(tg.d+28*stepDrift(b.dd,dt)*k-b.off.d)*e;
@@ -1158,11 +1160,11 @@ function gaitPose(rig,p,r,amp){
     if(u>1&&!visible||u>1.8)f.wait=rnd(...f.rewait);
   }
   const flocks=[
-    makeFlock({count:[6,10],kinds:['approach','approach','recede','cross'],lowChance:.55,firstWait:[0,0],rewait:[4,9]}),
-    makeFlock({count:[5,9],kinds:['approach','recede','cross','far'],lowChance:.4,firstWait:[5,9],rewait:[8,16]}),
+    makeFlock({count:[6,10],kinds:['approach','approach','recede','cross'],lowChance:.35,firstWait:[0,0],rewait:[4,9]}),
+    makeFlock({count:[5,9],kinds:['approach','recede','cross','far'],lowChance:.2,firstWait:[5,9],rewait:[8,16]}),
     // a distant flock that stays far out, for depth
     makeFlock({count:[6,12],kinds:['far','far','skein'],lowChance:0,firstWait:[2,4],rewait:[10,20]}),
-    makeFlock({count:[24,38],kinds:['horizon'],lowChance:0,firstWait:[6,12],rewait:[18,40]})
+    makeFlock({count:[24,38],kinds:['horizon'],lowChance:0,firstWait:[10,20],rewait:[40,80]})
   ];
   size();launch(flocks[0]);flocks[0].u=.3;addEventListener('resize',size);
   const drawList=[];
