@@ -917,7 +917,10 @@ function gaitPose(rig,p,r,amp){
   function drawBird(d){
     const k=d.s*dpr,fx=d.flip?-1:1,c=Math.cos(d.pitch*fx)*k,sn=Math.sin(d.pitch*fx)*k;
     ctx.setTransform(c*fx,sn*fx,-sn,c,dpr*d.x,dpr*d.y);ctx.globalAlpha=d.alpha;
-    const h=d.haze;ctx.fillStyle=d.color||`rgb(${Math.round(23+177*h)},${Math.round(19+131*h)},${Math.round(27+103*h)})`;
+    // warm and dark on the back, lighter toward the belly where the low sun lights it from below; haze fades both toward the sky
+    const h=d.haze,mix=a=>a.map((v,i)=>Math.round(v+([214,166,150][i]-v)*h)).join(',');
+    if(d.color)ctx.fillStyle=d.color;
+    else{const g=ctx.createLinearGradient(0,-70,0,40);g.addColorStop(0,`rgb(${mix([48,34,42])})`);g.addColorStop(1,`rgb(${mix([112,78,76])})`);ctx.fillStyle=g}
     // the bank is a roll of the whole bird about its long axis (see proj); positive lifts the near wing
     HK=d.hk;HYAW=d.hz;RC=Math.cos(d.bank*D);RS=Math.sin(d.bank*D);
     const p=d.p,q=d.asym,fa=q&&q.side<0?q:{e1:0,e2:0},na=q&&q.side>0?q:{e1:0,e2:0};
