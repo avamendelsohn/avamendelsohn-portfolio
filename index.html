@@ -332,6 +332,7 @@ body{font-family:"Asap",system-ui,sans-serif}
 /* contact links and the walker on the water in sunset peach */
 .contact{color:#f0c4a0!important;text-shadow:none!important}
 .walker.light.sea:not(.up){color:#f0c4a0}
+.walker.inroom{color:var(--wfg)!important}
 @media (max-width:760px){.intro header{flex-direction:column;align-items:flex-start;gap:14px}.intro header .name{font-size:clamp(28px,7.4vw,46px)!important;margin-top:8px!important}}
 </style>
 </head>
@@ -572,9 +573,9 @@ function layout(){placeWalker();maxX=Math.max(0,rail.scrollWidth-innerWidth);wal
 const X0=()=>Math.max(0,X);
 // top bar colour: each part (name, timeline, About) takes the text colour of the room under it; blue over the sunset
 const roomFg=new Map(),hudParts=[['.home',()=>parseFloat(getComputedStyle(hud).paddingLeft)+60],['.mid',()=>innerWidth/2],['.ab',()=>innerWidth-parseFloat(getComputedStyle(hud).paddingRight)-30]].map(([q,f])=>[hud.querySelector(q),f]);
+function fgOf(r){if(!roomFg.has(r))roomFg.set(r,r.classList.contains('intro')?'#1f5fd1':(getComputedStyle(r).getPropertyValue('--fg').trim()||getComputedStyle(r).color));return roomFg.get(r)}
 function hudTint(x){hudParts.forEach(([el,f])=>{if(!el)return;const wx=x+f(),r=rooms.find(r=>wx>=r.offsetLeft&&wx<r.offsetLeft+r.offsetWidth);if(!r)return;
-  if(!roomFg.has(r))roomFg.set(r,r.classList.contains('intro')?'#1f5fd1':(getComputedStyle(r).getPropertyValue('--fg').trim()||getComputedStyle(r).color));
-  const c=roomFg.get(r);if(el.style.color!==c)el.style.color=c})}
+  const c=fgOf(r);if(el.style.color!==c)el.style.color=c})}
 const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
 function update(force){
   const x=Math.min(maxX,Math.max(0,scrollY-walk.offsetTop));
@@ -588,6 +589,7 @@ function update(force){
   const wx=x+walker.offsetLeft+walker.offsetWidth/2,under=rooms.find(r=>wx>=r.offsetLeft&&wx<r.offsetLeft+r.offsetWidth);
   walker.classList.toggle('light',!!under&&['photo','about','intro','outdoor','personal'].some(c=>under.classList.contains(c)));  // light on dark walls and over the sea
   walker.classList.toggle('sea',!!under&&['intro','outdoor'].some(c=>under.classList.contains(c)));
+  const inRoom=!!under&&under.classList.contains('room')&&!under.classList.contains('outdoor');walker.classList.toggle('inroom',inRoom);if(inRoom)walker.style.setProperty('--wfg',fgOf(under));  // in the rooms she wears the room's text colour
   let cur=0;stops.forEach((s,i)=>{if(s.x<=x+innerWidth*.5)cur=i});
   win.style.transform=`translateX(${stops[cur].tick.offsetLeft+.5-win.offsetWidth/2}px)`;
   const room=stops[cur].room.dataset.name;if(where.textContent!==room)where.textContent=room;
