@@ -153,7 +153,7 @@ button{font:inherit;color:inherit}
 .room.ux{--bg:#e4d7dc;--fg:#5b4463;--muted:rgba(91,68,99,.8)}   /* same purple tint as Artwork (was #ececea) */
 .room.personal{--bg:#33263a;--fg:#e4d7dc;--muted:rgba(228,215,220,.72)}   /* dark purple, like Photography and About (was #e4e8e0) */
 
-.room.arch{--bg:#f3f2ec;--fg:#1d2a38;--muted:#5d6f84;background-image:linear-gradient(rgba(60,110,170,.11) 1px,transparent 1px),linear-gradient(90deg,rgba(60,110,170,.11) 1px,transparent 1px);background-size:28px 28px}
+.room.arch{--bg:#e4d7dc;--fg:#5b4463;--muted:rgba(91,68,99,.8);background-image:linear-gradient(rgba(60,110,170,.11) 1px,transparent 1px),linear-gradient(90deg,rgba(60,110,170,.11) 1px,transparent 1px);background-size:28px 28px}
 .arch .piece .frame{background:#fff;border:1px solid #a9b8c9}
 .arch .piece .frame img{object-fit:contain}
 
@@ -322,6 +322,10 @@ body{font-family:"Asap",system-ui,sans-serif}
 .intro .nav{color:#1f5fd1}
 .intro header{transition:opacity .3s}.intro.gone header{opacity:0;pointer-events:none}  /* name colour: was #c2501d */
 .hud .mid{transition:opacity .3s ease}
+/* the top bar takes each room's own text colour (set from the script) instead of a difference blend */
+.hud{mix-blend-mode:normal!important}.hud>*{transition:color .25s ease,opacity .3s ease}
+.ruler button{background-color:currentColor!important;opacity:.6}.ruler button.room-start{opacity:1}.ruler .win{border-color:currentColor!important}
+.hud .home:hover{color:#aa8898!important}
 .hud:not(.out) .mid{opacity:0;pointer-events:none}
 /* phones: tall screens stretch the sky, so the warm orange starts higher up (water stops unchanged) */
 @media (max-aspect-ratio:4/5){.intro{background:linear-gradient(180deg,#f0d2ac 0%,#f9cd96 11%,#ffc07c 24%,#fdae69 38%,#f99f5e 52%,#f6925a 64%,#f88a4f 74%,#fa8648 81%,#fc8a40 85.9%,#e1814e 86.1%,#bf7b5e 88.5%,#95746f 91.5%,#6c616a 95.5%,#56535c 100%)}}
@@ -478,7 +482,7 @@ const PROJECTS=[
  // placeholders until photos and details are in
  {id:"furniture",title:"Matchbook Shelves",kind:"Personal · Furniture",for:"A furniture build",bg:"var(--kraft)",fg:"var(--ink)",cover:22,pos:"50% 50%",ar:"4/5",cbg:"#f4f2ee",
   blurb:"Stacking shelves built like matchboxes, with giant matches for legs.",intro:"Stacking shelves built like matchboxes: wood boxes that slide out like matchbox drawers, standing on giant matches with red heads. More on the build is coming soon.",skills:[]},
- {id:"bike",title:"Bike Build",kind:"Personal · Restoration",for:"A restoration and",bg:"var(--tomato)",fg:"var(--paper)",placeholder:true,noPhTitle:true,soon:"Photos coming soon",
+ {id:"bike",title:"Bike Build",kind:"Personal · Restoration",for:"A restoration and",bg:"#5b4463",fg:"#e4d7dc",placeholder:true,noPhTitle:true,soon:"Photos coming soon",
   blurb:"A bike restoration and build. Photos coming soon.",intro:"A bike restoration and build. Photos and the story of the build are coming soon.",skills:[]},
  {id:"knife",hidden:true,title:"Electric Knife",kind:"Product · Teardown & CAD",for:"Engineering study of an",bg:"var(--paper)",fg:"var(--ink)",x:75,y:170,w:250,r:-3,cover:5,ar:"3/2",cbg:"#1d1a16",
   blurb:"Taking one apart and redesigning it for people with less grip strength.",
@@ -566,12 +570,18 @@ function placeWalker(){
 }
 function layout(){placeWalker();maxX=Math.max(0,rail.scrollWidth-innerWidth);walk.style.height=maxX+innerHeight+'px';stops.forEach(s=>{const r=s.el.getBoundingClientRect();s.x=r.left+X0()+(s.start?0:r.width/2-innerWidth/2)});update(true)}
 const X0=()=>Math.max(0,X);
+// top bar colour: each part (name, timeline, About) takes the text colour of the room under it; blue over the sunset
+const roomFg=new Map(),hudParts=[['.home',()=>parseFloat(getComputedStyle(hud).paddingLeft)+60],['.mid',()=>innerWidth/2],['.ab',()=>innerWidth-parseFloat(getComputedStyle(hud).paddingRight)-30]].map(([q,f])=>[hud.querySelector(q),f]);
+function hudTint(x){hudParts.forEach(([el,f])=>{if(!el)return;const wx=x+f(),r=rooms.find(r=>wx>=r.offsetLeft&&wx<r.offsetLeft+r.offsetWidth);if(!r)return;
+  if(!roomFg.has(r))roomFg.set(r,r.classList.contains('intro')?'#1f5fd1':(getComputedStyle(r).getPropertyValue('--fg').trim()||getComputedStyle(r).color));
+  const c=roomFg.get(r);if(el.style.color!==c)el.style.color=c})}
 const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
 function update(force){
   const x=Math.min(maxX,Math.max(0,scrollY-walk.offsetTop));
   if(x===X&&!force)return;X=x;
   rail.style.transform=`translate3d(${-x}px,0,0)`;
   if(!reduce)intro.style.setProperty('--sink',Math.min(1,x/innerWidth).toFixed(3));
+  hudTint(x);
   hud.classList.toggle('out',x>innerWidth*.6);intro.classList.toggle('gone',x>innerWidth*.6);  // the home name and links fade as the top bar's take over
   wTarget=wStart+(wEnd-wStart)*Math.min(1,x/wEndX);
   if(force||wLeft<0){wLeft=wTarget;walker.style.left=wLeft.toFixed(1)+'px'}
