@@ -834,21 +834,21 @@ function gaitPose(rig,p,r,amp){
     // and about 0.8 as wide as it is tall (narrower toward the chest and tail). They go through the same roll as
     // everything else, so a banked bird shows a little of its back or belly; at no bank they sit inside the traced
     // outline, so the level silhouette is unchanged
-    ctx.fill();if(!TORSO)TORSO=torso();ctx.beginPath();
-    for(const st of TORSO){let first=true;
-      for(let i=0;i<14;i++){const t=TAU*i/14,[X,Y]=proj(st.x,st.c+st.a*Math.cos(t),st.b*Math.sin(t));first?(ctx.moveTo(X,Y),first=false):ctx.lineTo(X,Y)}
+    ctx.fill();if(!TORSO)TORSO=torso(1.5);if(SEG>14&&!TORSO_FINE)TORSO_FINE=torso(.25);ctx.beginPath();
+    for(const st of SEG>14?TORSO_FINE:TORSO){let first=true;
+      for(let i=0;i<SEG;i++){const t=TAU*i/SEG,[X,Y]=proj(st.x,st.c+st.a*Math.cos(t),st.b*Math.sin(t));first?(ctx.moveTo(X,Y),first=false):ctx.lineTo(X,Y)}
       ctx.closePath()}
     ctx.fill();
   }
-  let TORSO=null;
+  let TORSO=null,TORSO_FINE=null,SEG=14;   // big birds get more and closer cross-sections so the outline stays smooth
   const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
   // half-width of the body seen from above, bill to tail, in bird units (Ava's traced side outline sets the height).
   // Long flat bill, a rounded head, the short thick neck tucked into the shoulders, the broad chest and back, then a
   // fan-shaped tail that is wider than it is deep
   const WIDTH=[[-68.4,.5],[-60,1.6],[-45,2.2],[-34,2.8],[-30,4.4],[-26,6.2],[-21,6.8],[-15,6.6],[-8,8.6],[0,11.8],[10,13.4],[24,13.4],[38,11.4],[48,8.6],[56,6.6],[63,7.2],[68,5.8],[71.3,2.4]];
   const halfW=x=>{for(let i=0;i<WIDTH.length-1;i++){const [x0,w0]=WIDTH[i],[x1,w1]=WIDTH[i+1];if(x<=x1){const k=clamp((x-x0)/(x1-x0),0,1),s=k*k*(3-2*k);return w0+(w1-w0)*s}}return .4};
-  function torso(){const n=BODY.length/2,out=[];
-    for(let x=-71.5;x<=70.5;x+=1.5){const ys=[];
+  function torso(dx){const n=BODY.length/2,out=[];
+    for(let x=-71.5;x<=70.5;x+=dx){const ys=[];
       for(let i=0;i<n;i++){const x1=BODY[i*2],y1=BODY[i*2+1],x2=BODY[((i+1)%n)*2],y2=BODY[((i+1)%n)*2+1];
         if((x1-x)*(x2-x)<0||(x1===x&&x2!==x))ys.push(y1+(y2-y1)*(x-x1)/(x2-x1))}
       ys.sort((a,b)=>a-b);
@@ -915,7 +915,7 @@ function gaitPose(rig,p,r,amp){
   // one bird on screen at (x,y), s screen pixels per bird unit. flip mirrors it to fly right; pitch tilts the
   // nose up (positive) or down; haze fades it toward the sky color with distance
   function drawBird(d){
-    const k=d.s*dpr,fx=d.flip?-1:1,c=Math.cos(d.pitch*fx)*k,sn=Math.sin(d.pitch*fx)*k;
+    const k=d.s*dpr,fx=d.flip?-1:1;SEG=k>1.5?Math.min(64,Math.ceil(14*Math.sqrt(k))):14;const c=Math.cos(d.pitch*fx)*k,sn=Math.sin(d.pitch*fx)*k;
     ctx.setTransform(c*fx,sn*fx,-sn,c,dpr*d.x,dpr*d.y);ctx.globalAlpha=d.alpha;
     // warm and dark on the back, lighter toward the belly where the low sun lights it from below; haze fades both toward the sky
     const h=d.haze,mix=a=>a.map((v,i)=>Math.round(v+([214,166,150][i]-v)*h)).join(',');
