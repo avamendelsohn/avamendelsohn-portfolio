@@ -788,7 +788,7 @@ function gaitPose(rig,p,r,amp){
 (()=>{
   const sky=document.querySelector('.sky'),intro=document.querySelector('.intro');
   if(!sky||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  const cv=document.createElement('canvas'),ctx=cv.getContext('2d');sky.appendChild(cv);
+  const cv=document.createElement('canvas');let ctx=cv.getContext('2d');sky.appendChild(cv);
   cv.style.cssText='position:absolute;inset:0;width:100%;height:100%';
   const D=Math.PI/180,TAU=Math.PI*2,rnd=(a,b)=>a+Math.random()*(b-a),lerp=(a,b,k)=>a+(b-a)*k;
 
@@ -917,7 +917,7 @@ function gaitPose(rig,p,r,amp){
   function drawBird(d){
     const k=d.s*dpr,fx=d.flip?-1:1,c=Math.cos(d.pitch*fx)*k,sn=Math.sin(d.pitch*fx)*k;
     ctx.setTransform(c*fx,sn*fx,-sn,c,dpr*d.x,dpr*d.y);ctx.globalAlpha=d.alpha;
-    const h=d.haze;ctx.fillStyle=`rgb(${Math.round(23+177*h)},${Math.round(19+131*h)},${Math.round(27+103*h)})`;
+    const h=d.haze;ctx.fillStyle=d.color||`rgb(${Math.round(23+177*h)},${Math.round(19+131*h)},${Math.round(27+103*h)})`;
     // the bank is a roll of the whole bird about its long axis (see proj); positive lifts the near wing
     HK=d.hk;HYAW=d.hz;RC=Math.cos(d.bank*D);RS=Math.sin(d.bank*D);
     const p=d.p,q=d.asym,fa=q&&q.side<0?q:{e1:0,e2:0},na=q&&q.side>0?q:{e1:0,e2:0};
@@ -939,6 +939,8 @@ function gaitPose(rig,p,r,amp){
   // to take the lead while the old leader drops back into the slipstream. Nothing follows a sine or random jitter:
   // speed, altitude and slot drift come from smooth springs chasing targets that change at uneven intervals.
   let W=0,H=0,dpr=1,F=1,CX=0,CY=0;
+  // lets the About page draw the same pelican on its own canvas
+  window.__pel={draw:(c2,d,dp)=>{const c0=ctx,p0=dpr;ctx=c2;dpr=dp;drawBird(d);ctx=c0;dpr=p0},pose,GLIDE};
   function size(){W=intro.clientWidth;H=intro.clientHeight;dpr=Math.min(2,devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;
     F=Math.max(W*.9,H*.7);CX=W*.5;CY=H*.14}
   const ZFAR=14000,ZNEAR=2000,V=620;
@@ -1386,6 +1388,29 @@ const PLACES=[
   a.addEventListener('mouseenter',show);a.addEventListener('focus',show);a.addEventListener('click',show);
   a.addEventListener('mouseleave',()=>tip.classList.remove('on'));a.addEventListener('blur',()=>tip.classList.remove('on'));
   g.appendChild(a)})})();
+</script>
+<script>
+// About: one huge pelican silhouette, a shade off the wall, running off the top right corner
+(()=>{
+  const about=document.getElementById('about'),P=window.__pel;if(!about||!P)return;
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const cv=document.createElement('canvas'),ctx=cv.getContext('2d');
+  cv.setAttribute('aria-hidden','true');
+  cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0';
+  about.prepend(cv);
+  const st=document.createElement('style');st.textContent='#about .in{position:relative;z-index:1}#about .abc{z-index:1}';document.head.appendChild(st);
+  let W=0,H=0,dpr=1;
+  const size=()=>{W=about.clientWidth;H=about.clientHeight;dpr=Math.min(2,devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr};
+  addEventListener('resize',size);size();
+  function frame(now){
+    requestAnimationFrame(frame);
+    const r=about.getBoundingClientRect();if(r.right<0||r.left>innerWidth)return;
+    ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);
+    const s=Math.min(H*1.5/200,W*.75/142),bob=reduce?0:Math.sin(now/1000*Math.PI*2/14)*6;
+    P.draw(ctx,{x:W*.9,y:H*.22+bob,s,color:'#3d2e46',bank:-30,p:P.GLIDE,flip:false,pitch:0,alpha:1,haze:0,hk:1,hz:0,asym:null},dpr)
+  }
+  requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
