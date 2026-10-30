@@ -106,6 +106,10 @@ button{font:inherit;color:inherit}
 .door .sub{margin:0 0 18px;font:italic 400 clamp(22px,2.2vw,30px)/1 var(--serif)}
 .door .blurb{margin:0;max-width:30ch;font-size:16px;line-height:1.45;color:var(--muted)}
 .door .count{display:block;margin-top:22px;font:400 28px/1 var(--serif);color:var(--muted)}
+/* studio intro: mediums as a small label above the title, no arrow */
+.door{display:flex;flex-direction:column}.door .count{display:none}
+.door .blurb{order:-1;max-width:none;margin:0 0 12px;font:500 11px/1.6 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.door h2{margin-top:0}
 .room a{-webkit-user-drag:none}
 .room img{-webkit-user-drag:none;pointer-events:none}
 
