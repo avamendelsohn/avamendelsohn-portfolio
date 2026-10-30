@@ -333,6 +333,11 @@ body{font-family:"Asap",system-ui,sans-serif}
 .contact{color:#f0c4a0!important;text-shadow:none!important}
 .walker.light.sea:not(.up){color:#f0c4a0}
 .walker.inroom{color:var(--wfg)!important}
+/* About: three steps of the purple palette instead of one colour (and no peach) */
+.about .lede{color:#f6f0f3}
+.about p:not(.lede){color:#d9cad1}
+.about h2,.about h3{color:#aa8898;opacity:1}
+.about .contact{color:#d9cad1!important}.about .contact a{transition:color .2s}.about .contact a:hover{color:#aa8898}
 @media (max-width:760px){.intro header{flex-direction:column;align-items:flex-start;gap:14px}.intro header .name{font-size:clamp(28px,7.4vw,46px)!important;margin-top:8px!important}}
 </style>
 </head>
@@ -409,16 +414,14 @@ body{font-family:"Asap",system-ui,sans-serif}
 <section class="room about" id="about" aria-labelledby="ab"><div class="in">
   <h2 id="ab">About</h2>
   <div>
-    <p class="lede">I'm a Senior Experience Designer at Autodesk, with a background in human factors engineering, architecture and studio art.</p>
-    <p>I've been at Autodesk since July of 2024. My art background and training in human factors shape how I work: I start with how people actually use something, then design with aesthetic and craft at the forefront.</p>
+    <p class="lede">I'm a designer with a background in studio art, human factors engineering, and architecture.</p>
+    <p>My art background and training in human factors shape how I work: I start with how people actually use something, then design with aesthetic and craft at the forefront.</p>
     <p>Outside of work I love to make things by hand: I build furniture, restore bikes, paint and print. I spend as much time outdoors as possible, biking, hiking, birdwatching or looking for the highest place to watch a sunset.</p>
     <p>I'm always excited to talk about design, fabrication, the outdoors, or any sort of combination.</p>
   </div>
   <div>
-    <h3>Experience</h3><p>Senior Experience Designer, Autodesk · since July 2024</p>
+    <h3>Currently</h3><p>Senior Experience Designer, Autodesk · since July 2024</p>
     <h3 class="gap">Education</h3><p>Tufts University and the School of the Museum of Fine Arts, Boston, five-year dual degree: BS in Human Factors Engineering / UX Design, BA in Architectural Studies, BFA in Studio Art.</p>
-    <h3 class="gap">Interests</h3><p>Experience design, human factors, UX research, product and industrial design, furniture and fabrication, bike restoration, architecture and interiors, painting, printmaking, the outdoors.</p>
-    <h3 class="gap">Tools</h3><p>Figma, Figma Make, Claude, AI prototyping, Illustrator, Photoshop, InDesign, Rhino, SolidWorks, Revit, AutoCAD.</p>
   </div>
 </div>
   <dl class="contact abc">
@@ -606,6 +609,11 @@ const placeRuler=()=>{const h=document.getElementById('hud'),m=h&&h.querySelecto
   if(innerWidth<=760){h.style.setProperty('--mx','0px');return}
   const t=m.style.transform;m.style.transition='none';h.style.setProperty('--mx','0px');const r=m.getBoundingClientRect(),nl=n.getBoundingClientRect().left;
   h.style.setProperty('--mx',Math.max(0,nl-32-r.right)+'px');m.offsetWidth;m.style.transition=''};
+// About: the right column starts level with the first body paragraph under the big intro line (two-column layout only)
+const alignAbout=()=>{const cols=document.querySelectorAll('#about .in>div');if(cols.length<2)return;const r=cols[1],p=cols[0].querySelector('.lede+p');r.style.marginTop='';
+  if(!p||Math.abs(r.getBoundingClientRect().top-cols[0].getBoundingClientRect().top)>2)return;  // stacked on phones
+  const h=r.querySelector('h3');r.style.marginTop=Math.max(0,p.getBoundingClientRect().top-(h||r).getBoundingClientRect().top)+'px'};
+addEventListener('resize',alignAbout);addEventListener('load',alignAbout);document.fonts&&document.fonts.ready.then(alignAbout);alignAbout();
 addEventListener('resize',placeRuler);addEventListener('load',placeRuler);document.fonts&&document.fonts.ready.then(placeRuler);placeRuler();
 // nav links jump along the walk instead of to an anchor
 document.addEventListener('click',e=>{const a=e.target.closest('a[href="#studios"],a[href="#about"],a[href="#top"]');if(!a)return;e.preventDefault();
