@@ -151,7 +151,7 @@ button{font:inherit;color:inherit}
 .piece.hold .frame span{font:500 11px/1 var(--mono,ui-monospace,monospace);letter-spacing:.14em;text-transform:uppercase;color:rgba(246,243,236,.45)}
 
 .room.ux{--bg:#e4d7dc;--fg:#33263a;--muted:rgba(51,38,58,.72)}   /* same purple tint as Artwork (was #ececea) */
-.room.personal{--bg:#e4e8e0;--muted:#66705f}
+.room.personal{--bg:#33263a;--fg:#e4d7dc;--muted:rgba(228,215,220,.72)}   /* dark purple, like Photography and About (was #e4e8e0) */
 
 .room.arch{--bg:#f3f2ec;--fg:#1d2a38;--muted:#5d6f84;background-image:linear-gradient(rgba(60,110,170,.11) 1px,transparent 1px),linear-gradient(90deg,rgba(60,110,170,.11) 1px,transparent 1px);background-size:28px 28px}
 .arch .piece .frame{background:#fff;border:1px solid #a9b8c9}
@@ -576,7 +576,7 @@ function update(force){
   wTarget=wStart+(wEnd-wStart)*Math.min(1,x/wEndX);
   if(force||wLeft<0){wLeft=wTarget;walker.style.left=wLeft.toFixed(1)+'px'}
   const wx=x+walker.offsetLeft+walker.offsetWidth/2,under=rooms.find(r=>wx>=r.offsetLeft&&wx<r.offsetLeft+r.offsetWidth);
-  walker.classList.toggle('light',!!under&&['photo','about','intro','outdoor'].some(c=>under.classList.contains(c)));  // light on dark walls and over the sea
+  walker.classList.toggle('light',!!under&&['photo','about','intro','outdoor','personal'].some(c=>under.classList.contains(c)));  // light on dark walls and over the sea
   walker.classList.toggle('sea',!!under&&['intro','outdoor'].some(c=>under.classList.contains(c)));
   let cur=0;stops.forEach((s,i)=>{if(s.x<=x+innerWidth*.5)cur=i});
   win.style.transform=`translateX(${stops[cur].tick.offsetLeft+.5-win.offsetWidth/2}px)`;
